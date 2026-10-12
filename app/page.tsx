@@ -143,7 +143,7 @@ const projects = [
     index: "10",
     title: "Interactive Puzzle Challenge",
     category: "Puzzle Game · Touchscreen Experience",
-    image: "/projects/interactive-puzzle-game.png",
+    image: "/projects/interactive-puzzle-game-2.png",
     imageAlt: "Papan puzzle jigsaw interaktif dengan timer, skor, level, progress, dan tombol hint",
     description:
       "Game interaktif yang menantang pemain menyusun potongan gambar sebelum waktu habis, lengkap dengan level bertahap, hint, progress, dan perhitungan skor.",
@@ -235,7 +235,7 @@ const labProjects = [
     index: "17",
     title: "Flight Catch Challenge",
     type: "Endless runner 3D",
-    image: "/projects/flight-catch.png",
+    image: "/projects/flight-catch-2.png",
     imageAlt: "Karakter biru berlari di runway mengumpulkan tiket dan menghindari koper",
     description:
       "Permainan bertema penerbangan dengan lintasan runway, koleksi boarding pass, obstacle, timer, dan camera shake.",
