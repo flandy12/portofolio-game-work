@@ -168,11 +168,26 @@ const projects = [
     stack: ["HTML5", "CSS3", "JavaScript", "LocalStorage"],
     tone: "rose",
   },
+  {
+    id: "lucky-pop-gacha",
+    index: "12",
+    title: "Lucky Pop! Gacha",
+    category: "Prize Game Â· Booth Activation",
+    image: "/projects/lucky-pop-gacha.png",
+    imageAlt: "Tampilan Lucky Pop dengan mesin gacha, daftar hadiah, dan alur permainan untuk activity booth",
+    description:
+      "Game gacha interaktif untuk activity booth yang mengajak peserta memilih kapsul, menarik tuas, lalu menerima hadiah beserta kode klaim unik.",
+    challenge:
+      "Menjaga proses undian tetap jelas dan cepat sambil mengelola bobot peluang, stok hadiah, validasi input peserta, serta riwayat sesi tanpa backend.",
+    features: ["Weighted prize pool", "Kontrol stok hadiah", "Kode klaim unik", "Riwayat & ekspor CSV"],
+    stack: ["HTML5", "CSS3", "JavaScript", "LocalStorage"],
+    tone: "rose",
+  },
 ];
 
 const labProjects = [
   {
-    index: "12",
+    index: "13",
     title: "Flappy Multiplayer",
     type: "Realtime multiplayer prototype",
     image: "/projects/flappy-multiplayer.png",
@@ -184,7 +199,7 @@ const labProjects = [
     accent: "violet",
   },
   {
-    index: "13",
+    index: "14",
     title: "Hand Catch",
     type: "Computer vision browser game",
     image: "/projects/hand-catch.png",
@@ -196,7 +211,7 @@ const labProjects = [
     accent: "green",
   },
   {
-    index: "14",
+    index: "15",
     title: "Gesture Paddle",
     type: "Python vision experiment",
     image: "/projects/gesture-paddle.png",
@@ -208,7 +223,7 @@ const labProjects = [
     accent: "lime",
   },
   {
-    index: "15",
+    index: "16",
     title: "Marimas Voice Chomp",
     type: "Voice-controlled brand game",
     image: "/projects/voice-chomp.png",
@@ -220,7 +235,7 @@ const labProjects = [
     accent: "orange",
   },
   {
-    index: "16",
+    index: "17",
     title: "Head Motion Flight",
     type: "Face-tracking 3D game",
     image: "/projects/head-motion-flight.png",
@@ -232,7 +247,7 @@ const labProjects = [
     accent: "cyan",
   },
   {
-    index: "17",
+    index: "18",
     title: "Flight Catch Challenge",
     type: "Endless runner 3D",
     image: "/projects/flight-catch-2.png",
@@ -345,7 +360,7 @@ export default function Home() {
             </div>
             <div className="console-main">
               <p className="console-label">SELECTED BUILDS</p>
-              <strong>17</strong>
+              <strong>{projects.length + labProjects.length}</strong>
               <p>Playable concepts, brand games & live installations</p>
             </div>
             <div className="console-stats">
