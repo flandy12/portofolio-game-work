@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory Game</title>
+  <style>
+    :root {
+      /* Palet dapat diganti dari satu tempat agar mudah mengikuti visual brand. */
+      --bg-dark: #29251f;
+      --bg-deep: #40382e;
+      --navy: #40382e;
+      --navy-2: #5a4b3b;
+      --navy-3: #28251f;
+      --panel: rgba(252, 249, 244, 0.88);
+      --panel-border: rgba(255, 255, 255, 0.6);
+      --card-back: #4a4034;
+      --card-back-alt: #2e2923;
+      --yellow: #f2b705;
+      --yellow-deep: #d99800;
+      --orange: #ca6b29;
+      --orange-deep: #a94f1f;
+      --sand: #b89576;
+      --sand-deep: #8f6f55;
+      --soft: #f7f2ea;
+      --text: #fffaf2;
+      --muted: #e7ddd0;
+      --dark-text: #302920;
+      --steel: #786b5e;
+      --shadow: rgba(61, 48, 35, 0.22);
+      --header-bg: #ffffff;
+      --header-surface: #f4efe9;
+      --header-border: #ddd2c8;
+      --header-text: #1F2327;
+      --header-muted: #6B7075;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 22px;
+      background:
+        linear-gradient(135deg, rgba(44, 34, 23, 0.16), rgba(241, 183, 5, 0.08)),
+        url('asset/bg-master.png') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .game-shell {
+      width: min(1280px, 100%);
+      margin: auto;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.2fr) repeat(3, minmax(110px, 1fr)) auto;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 18px 14px;
+      background: var(--header-bg);
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+      color: var(--header-text);
+    }
+
+
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 2.8vw, 3.7rem);
+      line-height: 0.9;
+      letter-spacing: 0.04em;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .brand small {
+      margin-top: 8px;
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      color: rgba(232, 240, 255, 0.85);
+      text-transform: uppercase;
+    }
+
+    .topbar .brand small {
+      color: var(--header-muted);
+    }
+
+    .stat-box {
+      min-height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .topbar .stat-box {
+      background: var(--header-surface);
+      border-color: var(--header-border);
+      color: var(--header-text);
+    }
+
+    .stat-icon {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--bg-dark);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .topbar .stat-icon {
+      background: #ffffff;
+      border-color: var(--header-border);
+      color: var(--header-text);
+    }
+
+    .stat-box strong {
+      display: block;
+      color: var(--bg-dark);
+      font-size: clamp(1.2rem, 1.6vw, 2rem);
+      line-height: 1.05;
+      font-weight: 800;
+    }
+
+    .topbar .stat-box strong,
+    .topbar .stat-box span {
+      color: var(--header-text);
+    }
+
+    .stat-box #timer {
+      font-size: clamp(2.5rem, 3.3vw, 4rem);
+      color: var(--dark-text);
+      border: 0;
+    }
+    .stat-box span {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bg-dark);
+    }
+
+    .combo-box {
+      min-height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      background: linear-gradient(155deg, #f6c719 0%, var(--yellow) 52%, var(--yellow-deep) 100%);
+      box-shadow: inset 0 1px rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .combo-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+
+    .combo-text strong {
+      font-size: clamp(2rem, 2.3vw, 3rem);
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .combo-text i {
+      font-size: 1.9rem;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .action-btn,
+    .help-btn,
+    .tips-btn,
+    .bottom-btn {
+      border: none;
+      cursor: pointer;
+      transition: transform 0.18s ease, filter 0.18s ease;
+    }
+
+    .action-btn:hover,
+    .help-btn:hover,
+    .tips-btn:hover,
+    .bottom-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+    }
+
+    .icon-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #fff;
+      font-size: 1.5rem;
+      display: grid;
+      place-items: center;
+    }
+
+    .topbar .icon-btn {
+      background: var(--header-surface);
+      border-color: var(--header-border);
+      color: var(--header-text);
+    }
+
+    .restart-btn {
+      min-height: 56px;
+      padding: 0 20px;
+      border-radius: 14px;
+      background: linear-gradient(155deg, #dc7b31 0%, var(--orange) 55%, var(--orange-deep) 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .game-main {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr) 220px;
+      gap: 18px;
+      padding: 18px 18px 16px;
+      background: rgba(255, 252, 247, 0.34);
+      backdrop-filter: blur(8px);
+      border-radius: 0 0 18px 18px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-radius: 20px;
+      background: linear-gradient(160deg, rgba(184, 149, 118, 0.94), rgba(143, 111, 85, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      box-shadow: 0 10px 22px rgba(70, 49, 32, 0.14);
+      min-height: 700px;
+      padding: 18px 16px 14px;
+    }
+
+    .stat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+    }
+
+    .mini-stat {
+      color: rgba(255, 255, 255, 0.95);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.7rem;
+    }
+
+    .mini-stat strong {
+      display: block;
+      line-height: 1;
+      margin-top: 8px;
+      font-size: clamp(2rem, 2vw, 3.1rem);
+      letter-spacing: 0.04em;
+    }
+
+    .help-btn {
+      background: rgba(255, 250, 242, 0.9);
+      border-radius: 14px;
+      min-height: 52px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--dark-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .board-wrap {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      box-shadow: 0 12px 28px rgba(73, 56, 39, 0.14);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 8px;
+    }
+
+    .board {
+      width: min(100%, 760px);
+      display: grid;
+      grid-template-columns: repeat(5, minmax(90px, 1fr));
+      gap: 12px;
+    }
+
+    .tile {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      border: none;
+      border-radius: 18px;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--card-back) 0%, var(--card-back-alt) 100%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 6px 14px rgba(47, 38, 28, 0.2);
+      cursor: pointer;
+    }
+
+    .tile .back,
+    .tile .front {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .tile .back {
+      background: linear-gradient(180deg, var(--card-back) 0%, var(--card-back-alt) 100%);
+    }
+
+    .tile .front {
+      background: linear-gradient(180deg, #fffdf8 0%, #efe4d5 100%);
+      opacity: 0;
+      transform: scale(0.96);
+    }
+
+    .tile.is-flipped .back {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+
+    .tile.is-flipped .front {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .tile.is-matched {
+      box-shadow: 0 0 0 2px rgba(242, 183, 5, 0.75), 0 8px 18px rgba(217, 152, 0, 0.24);
+      animation: matchPulse 0.5s ease-out;
+    }
+
+    @keyframes matchPulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.08);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes confetti-pop {
+      0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-60px) rotate(360deg);
+      }
+    }
+
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      font-size: 1.5rem;
+      animation: confetti-pop 0.8s ease-out forwards;
+    }
+
+    @keyframes comboBounce {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.15);
+      }
+    }
+
+    .combo-card.bounce {
+      animation: comboBounce 0.4s ease-in-out;
+    }
+
+    .tile:hover:not(.is-matched):not(.is-flipped) {
+      box-shadow: inset 0 0 0 2px rgba(242, 183, 5, 0.48), 0 8px 20px rgba(100, 76, 51, 0.24);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .game-alert-modal {
+      background: linear-gradient(150deg, #fffdf8 0%, #f0e4d4 100%);
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      border-radius: 24px;
+      box-shadow: 0 18px 48px rgba(61, 48, 35, 0.3);
+      color: var(--dark-text);
+      width: min(420px, 90%);
+      padding: 30px;
+      text-align: center;
+      animation: slideUp 0.35s ease-out;
+    }
+
+    .game-alert-icon {
+      display: grid;
+      place-items: center;
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: rgba(242, 183, 5, 0.16);
+      color: var(--orange-deep);
+      font-size: 2rem;
+    }
+
+    .game-alert-title {
+      color: var(--dark-text);
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .game-alert-content {
+      color: var(--steel);
+      line-height: 1.6;
+      white-space: pre-line;
+      margin: 12px 0 0;
+    }
+
+    .game-alert-button {
+      background: linear-gradient(155deg, #dc7b31 0%, var(--orange) 55%, var(--orange-deep) 100%) !important;
+      border: 0;
+      border-radius: 12px !important;
+      box-shadow: none !important;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 800 !important;
+      letter-spacing: 0.04em;
+      margin-top: 22px;
+      padding: 12px 22px !important;
+    }
+
+    .game-alert-button:focus-visible {
+      box-shadow: 0 0 0 3px rgba(242, 183, 5, 0.35) !important;
+      outline: none;
+    }
+
+    .game-alert-score {
+      margin: 18px 0 6px;
+      padding: 16px;
+      border: 1px solid rgba(202, 107, 41, 0.18);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .game-alert-score span,
+    .game-alert-score small {
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .game-alert-score span {
+      font-size: 0.72rem;
+      color: var(--steel);
+    }
+
+    .game-alert-score strong {
+      display: block;
+      margin: 4px 0;
+      color: var(--orange-deep);
+      font-size: clamp(2.5rem, 7vw, 4rem);
+      line-height: 1;
+    }
+
+    .game-alert-score small {
+      font-size: 0.72rem;
+      color: var(--dark-text);
+    }
+
+    .win-modal {
+      background: linear-gradient(180deg, #F4F4F2 0%, #e9e9e5 100%);
+      border-radius: 28px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(60px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .win-modal .title {
+      font-size: 3rem;
+      margin: 0 0 16px;
+      font-weight: 900;
+    }
+
+    .win-modal .celebration {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+      letter-spacing: 0.15em;
+    }
+
+    .win-modal .message {
+      font-size: 1.2rem;
+      color: #1F2327;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: rgba(245, 180, 0, 0.1);
+      border: 2px solid #F5B400;
+      border-radius: 12px;
+      padding: 12px;
+      color: #1F2327;
+    }
+
+    .stat-card .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .stat-card .value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      margin-top: 4px;
+    }
+
+    .rating-stars {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      letter-spacing: 0.3em;
+    }
+
+    .achievement-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--yellow) 0%, var(--orange) 100%);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 8px 4px;
+    }
+
+    .achievements-row {
+      margin-bottom: 20px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+      color: #1F2327;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(180deg, var(--orange) 0%, var(--orange-deep) 100%);
+      color: #fff;
+    }
+
+    .btn-primary:hover,
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    .level-indicator {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: var(--orange);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin-top: 8px;
+    }
+
+    .tile .qmark {
+      font-size: clamp(2.5rem, 2.2vw, 3rem);
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.76);
+    }
+
+    .tile .front img {
+      padding: 10px;
+      height: 70%;
+      object-fit: scale-down;
+      display: block;
+      border-radius: 18px;
+      filter: drop-shadow(0 8px 10px rgba(12, 21, 42, 0.15));
+    }
+
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .right-panel > .stat-box {
+      min-height: 104px;
+      background: rgba(255, 250, 243, 0.68);
+      border-color: rgba(255, 255, 255, 0.58);
+      box-shadow: 0 8px 18px rgba(73, 56, 39, 0.1);
+    }
+
+    .right-panel > .stat-box span {
+      color: var(--steel);
+    }
+
+    .combo-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 260px;
+      background: linear-gradient(155deg, #e29724 0%, var(--orange) 58%, var(--orange-deep) 100%);
+      border-radius: 18px;
+      padding: 16px 12px 18px;
+      box-shadow: 0 10px 22px rgba(119, 65, 27, 0.26);
+    }
+
+    .combo-card .title {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .combo-card .value {
+      margin-top: 8px;
+      font-size: clamp(3.2rem, 3vw, 4.3rem);
+      line-height: 0.9;
+      font-weight: 900;
+    }
+
+    .combo-card .bonus {
+      margin-top: 10px;
+      font-size: clamp(1.3rem, 1.6vw, 2rem);
+      font-weight: 800;
+    }
+
+    .score-box {
+      background: rgba(255, 250, 243, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      box-shadow: 0 8px 18px rgba(73, 56, 39, 0.1);
+      color: var(--dark-text);
+      min-height: 170px;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-align: center;
+      padding: 14px 12px;
+    }
+
+    .score-box .label {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.72rem;
+      color: rgba(48, 41, 32, 0.72);
+    }
+
+    .trophy {
+      font-size: 2.6rem;
+    }
+
+    .score-box .score {
+      font-size: clamp(2.3rem, 2vw, 3rem);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .tips-btn {
+      min-height: 52px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(34, 47, 72, 0.15);
+      color: var(--dark-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .bottom-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-radius: 22px 22px 0 0;
+      overflow: hidden;
+      box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .bottom-btn {
+      min-height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: clamp(1rem, 1.2vw, 1.7rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .bottom-btn.primary {
+      background: #edf2fa;
+      color: #122a52;
+    }
+
+    .bottom-btn.secondary {
+      background: #e8edf6;
+      color: #122a52;
+    }
+
+    .bottom-btn.danger {
+      background: linear-gradient(180deg, var(--orange) 0%, var(--orange-deep) 100%);
+      color: #fff;
+    }
+
+    .mini-icon {
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: 1100px) {
+      .topbar {
+        grid-template-columns: repeat(3, minmax(120px, 1fr));
+      }
+
+      .brand {
+        grid-column: span 2;
+      }
+
+      .game-main {
+        grid-template-columns: 170px minmax(0, 1fr);
+      }
+
+      .right-panel {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Tablet potret, termasuk resolusi 900 x 1600. */
+    @media (min-width: 761px) and (max-width: 1000px) and (orientation: portrait) {
+      body {
+        align-items: flex-start;
+        padding: 18px;
+      }
+
+      .game-shell {
+        width: min(704px, 100%);
+      }
+
+      .topbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        padding: 18px;
+      }
+
+      .brand,
+      .top-actions {
+        grid-column: 1 / -1;
+      }
+
+      .brand {
+        min-height: 58px;
+      }
+
+      .top-actions {
+        justify-content: stretch;
+      }
+
+      .top-actions .restart-btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .game-main {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 16px;
+      }
+
+      .side-panel {
+        min-height: 0;
+        gap: 16px;
+        padding: 16px;
+      }
+
+      .side-panel .stat-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        text-align: center;
+      }
+
+      .help-btn {
+        min-height: 48px;
+      }
+
+      .board-wrap {
+        padding: 16px;
+      }
+
+      .board {
+        width: 100%;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .right-panel {
+        grid-column: auto;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .right-panel > .stat-box,
+      .combo-card {
+        min-height: 190px;
+      }
+
+      .score-box {
+        grid-column: 1 / -1;
+        min-height: 150px;
+      }
+
+      .bottom-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 14px;
+      }
+
+      .topbar {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        gap: 12px;
+      }
+
+      .brand {
+        grid-column: span 2;
+      }
+
+      .game-main {
+        grid-template-columns: 1fr;
+      }
+
+      .side-panel {
+        min-height: auto;
+      }
+
+      .side-panel .stat-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        text-align: center;
+      }
+
+      .board {
+        grid-template-columns: repeat(4, minmax(70px, 1fr));
+      }
+
+      .right-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .topbar {
+        grid-template-columns: 1fr 1fr;
+        padding: 14px 12px 18px;
+      }
+
+      .brand {
+        grid-column: span 2;
+      }
+
+      .brand h1 {
+        font-size: 2.2rem;
+      }
+
+      .brand small {
+        letter-spacing: 0.08em;
+      }
+
+      .stat-box {
+        min-height: 70px;
+        padding: 8px;
+      }
+
+      .stat-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 1.2rem;
+      }
+
+      .game-main {
+        padding: 12px;
+      }
+
+      .board {
+        gap: 8px;
+      }
+
+      .tile {
+        border-radius: 14px;
+      }
+
+      .tile .front img {
+        border-radius: 14px;
+      }
+
+      .bottom-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* SPLASH SCREEN STYLES */
+    .splash-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        linear-gradient(135deg, rgba(44, 34, 23, 0.2), rgba(241, 183, 5, 0.1)),
+        url('asset/bg-master.png') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: splashFadeIn 0.5s ease-out;
+    }
+
+    @keyframes splashFadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes splashSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .splash-content {
+      background: rgba(255, 252, 247, 0.94);
+      border-radius: 32px;
+      padding: 48px 40px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.68);
+      box-shadow: 0 30px 80px rgba(61, 48, 35, 0.3);
+      animation: splashSlideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .splash-logo {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: splashBounce 1s ease-in-out infinite;
+    }
+
+    @keyframes splashBounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    .splash-title {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: #1F2327;
+      margin: 20px 0 10px;
+      letter-spacing: 0.03em;
+    }
+
+    .splash-subtitle {
+      font-size: 1rem;
+      color: #6B7075;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 24px;
+    }
+
+    .splash-description {
+      font-size: 1.05rem;
+      color: #1F2327;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .splash-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .splash-stat {
+      background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-deep) 100%);
+      padding: 12px;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    .splash-stat .value {
+      font-size: 1.8rem;
+      font-weight: 900;
+    }
+
+    .splash-stat .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.9;
+    }
+
+    .splash-btn {
+      background: linear-gradient(155deg, #f6c719 0%, var(--yellow) 52%, var(--yellow-deep) 100%);
+      color: #fff;
+      border: none;
+      padding: 16px 48px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 20px rgba(245, 180, 0, 0.3);
+    }
+
+    .splash-btn:hover {
+      transform: translateY(-3px);
+      filter: brightness(1.08);
+      box-shadow: 0 12px 30px rgba(245, 180, 0, 0.4);
+    }
+
+    .splash-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .splash-features {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .splash-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(242, 183, 5, 0.12);
+      border: 1px solid var(--yellow);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: #1F2327;
+      font-weight: 700;
+    }
+
+    .splash-overlay.hidden {
+      display: none;
+    }
+
+    @media (min-width: 761px) and (max-width: 1000px) and (orientation: portrait) {
+      .splash-overlay {
+        align-items: flex-start;
+        overflow-y: auto;
+        padding: 18px;
+      }
+
+      .splash-content {
+        width: min(864px, 100%);
+        max-width: none;
+        min-height: 0;
+        margin: auto;
+        padding: 44px 40px;
+        border-radius: 28px;
+      }
+
+      .splash-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .splash-btn {
+        min-width: min(360px, 100%);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- SPLASH WELCOME SCREEN -->
+  <div class="splash-overlay" id="splashScreen">
+    <div class="splash-content">
+      <div class="splash-logo">🧠</div>
+      <div class="splash-title">MEMORY</div>
+      <div class="splash-subtitle">Construction Challenge</div>
+
+      <div class="splash-description">
+        Cari pasangan gambar yang sama sebelum waktu habis! <br>
+        Tingkatkan skill ingatan mu di 5 level berbeda.
+      </div>
+
+      <div class="splash-stats">
+        <div class="splash-stat">
+          <div class="value">5</div>
+          <div class="label">Levels</div>
+        </div>
+        <div class="splash-stat">
+          <div class="value">∞</div>
+          <div class="label">Fun</div>
+        </div>
+      </div>
+
+      <button class="splash-btn" onclick="startGame()">Mulai Bermain 🚀</button>
+
+      <div class="splash-features">
+        <div class="splash-badge">⭐ Rating System</div>
+        <div class="splash-badge">🔥 5 Levels</div>
+        <div class="splash-badge">🏆 Achievements</div>
+        <div class="splash-badge">🔊 Sound FX</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="asset/logo.png" alt="Memory Game Logo" style="height: 48px; margin-bottom: 8px;">
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-icon">◫</div>
+        <div>
+          <span>Skor</span>
+          <strong id="score">0</strong>
+        </div>
+      </div>
+
+      <div class="combo-box">
+
+        <div class="combo-text">
+          <i>★</i>
+          <strong id="combo">x1</strong>
+        </div>
+        <div class="level-indicator" id="levelIndicator">Level 1</div>
+      </div>
+
+      <div class="top-actions">
+        <button class="action-btn icon-btn" aria-label="Audio">◉</button>
+        <button class="action-btn restart-btn" id="restartBtn" aria-label="Restart">↻ Restart</button>
+      </div>
+    </header>
+
+    <main class="game-main">
+      <aside class="side-panel">
+        <div class="stat-list">
+          <div class="mini-stat">
+            <span>Level</span>
+            <strong id="level">1</strong>
+          </div>
+
+          <div class="mini-stat">
+            <span>Target</span>
+            <strong id="target">10</strong>
+          </div>
+
+          <div class="mini-stat">
+            <span>Terbuka</span>
+            <strong id="opened">0</strong>
+          </div>
+        </div>
+
+        <button class="help-btn" id="helpBtn" type="button">? Bantuan</button>
+      </aside>
+
+      <section class="board-wrap">
+        <div class="board" id="board" aria-label="Memory board"></div>
+      </section>
+
+      <aside class="right-panel">
+        <div class="stat-box">
+          <div>
+            <span>Waktu</span>
+            <strong id="timer">00:45</strong>
+          </div>
+        </div>
+
+
+        <div class="combo-card">
+          <div class="title">Combo</div>
+          <div class="value" id="comboLarge">x1</div>
+          <div class="bonus" id="comboBonus">+0</div>
+        </div>
+
+        <div class="score-box">
+          <div class="label">Best Score</div>
+          <div class="trophy">🏆</div>
+          <div class="score" id="bestScore">0</div>
+        </div>
+
+      </aside>
+    </main>
+
+    <div class="bottom-bar" aria-label="Game controls">
+      <button class="bottom-btn secondary" id="difficultyBtn" type="button"><span class="mini-icon">▣</span> Level
+        Mudah</button>
+      <button class="bottom-btn danger" id="shuffleBtn" type="button"><span class="mini-icon">↻</span> Acak
+        Ulang</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="win-modal">
+      <div class="celebration" id="celebration">🎉</div>
+      <div class="title" id="winTitle">Menang!</div>
+      <div class="rating-stars" id="ratingStars">⭐⭐⭐</div>
+      <div class="message" id="winMessage">Luar biasa!</div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">Skor</div>
+          <div class="value" id="finalScore">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Waktu</div>
+          <div class="value" id="finalTime">45s</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Combo Max</div>
+          <div class="value" id="maxCombo">x1</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Akurasi</div>
+          <div class="value" id="accuracy">100%</div>
+        </div>
+      </div>
+
+      <div class="achievements-row" id="achievementsRow" style="display:none;">
+        <div id="achievementsList"></div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary" id="nextLevelBtn" onclick="nextLevel()">Lanjut Level ▶</button>
+        <button class="btn-secondary" id="retryBtn" onclick="retryGame()">Ulangi</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay game-alert-overlay" id="gameAlertOverlay" role="dialog" aria-modal="true"
+    aria-labelledby="gameAlertTitle">
+    <div class="game-alert-modal">
+      <div class="game-alert-icon" id="gameAlertIcon" aria-hidden="true">!</div>
+      <h2 class="game-alert-title" id="gameAlertTitle">Pemberitahuan</h2>
+      <p class="game-alert-content" id="gameAlertContent"></p>
+      <div class="game-alert-score" id="gameAlertScore" hidden>
+        <span id="gameAlertScoreLabel">Skor</span>
+        <strong id="gameAlertScoreValue">0</strong>
+        <small id="gameAlertScoreDetail"></small>
+      </div>
+      <button class="game-alert-button" id="gameAlertConfirm" type="button">Mengerti</button>
+    </div>
+  </div>
+
+  <script>
+    const assetList = [
+      'asset/master/gambar-1.png',
+      'asset/master/gambar-2.png',
+      'asset/master/gambar-3.png',
+      'asset/master/gambar-4.png',
+      'asset/master/gambar-5.png',
+      'asset/master/gambar-6.png',
+      'asset/master/gambar-7.png',
+      'asset/master/gambar-8.png',
+      'asset/master/gambar-9.png',
+      'asset/master/gambar-10.png',
+      'asset/master/gambar-11.png',
+      'asset/master/gambar-12.png',
+      'asset/master/safaty vest.png',
+      'asset/master/safaty booth.png',
+      'asset/master/helmet.png',
+    ];
+
+    const LEVELS = [
+      { pairs: 10, time: 45, difficulty: 'Mudah', color: '#F5B400' },
+      { pairs: 12, time: 50, difficulty: 'Normal', color: '#F5B400' },
+      { pairs: 14, time: 55, difficulty: 'Sulit', color: '#F47C20' },
+      { pairs: 15, time: 65, difficulty: 'Sangat Sulit', color: '#F47C20' },
+      { pairs: 15, time: 60, difficulty: 'Ekstrem', color: '#E74C3C' }
+    ];
+
+    const MOTIVATIONAL = [
+      'Luar biasa! Kamu hebat! 🚀',
+      'Fantastis! Konsentrasi bagus! 🧠',
+      'Sempurna! Terus pertahankan! 💪',
+      'Wow! Skill levelmu naik! ⚡',
+      'Bravo! Semakin cepat! ✨',
+      'Genius! Match sempurna! 🎯',
+      'Keren! Ingatan kuat! 🏆',
+      'Mantap! Semakin jago! 👑'
+    ];
+
+    const board = document.getElementById('board');
+    const timerEl = document.getElementById('timer');
+    const scoreEl = document.getElementById('score');
+    const comboEl = document.getElementById('combo');
+    const comboLargeEl = document.getElementById('comboLarge');
+    const comboBonusEl = document.getElementById('comboBonus');
+    const bestScoreEl = document.getElementById('bestScore');
+    const levelEl = document.getElementById('level');
+    const targetEl = document.getElementById('target');
+    const openedEl = document.getElementById('opened');
+
+    let deck = [];
+    let selectedCards = [];
+    let matchedPairs = 0;
+    let gameLocked = false;
+    let combo = 1;
+    let score = 0;
+    let timeLeft = 45;
+    let timerInterval = null;
+    let bestScore = Number(localStorage.getItem('memory_best_score') || 0);
+    let totalPairs = 10;
+    let currentLevel = 1;
+    let maxComboReached = 1;
+    let moves = 0;
+    let startTime = Date.now();
+    let gameStats = {
+      gamesPlayed: Number(localStorage.getItem('memory_gamesPlayed') || 0),
+      gamesWon: Number(localStorage.getItem('memory_gamesWon') || 0),
+      levelsUnlocked: Number(localStorage.getItem('memory_levelsUnlocked') || 1)
+    };
+
+    function formatTime(seconds) {
+      const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const secs = String(seconds % 60).padStart(2, '0');
+      return `${mins}:${secs}`;
+    }
+
+    // Sound Effects System
+    class SoundSystem {
+      constructor() {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.enabled = true;
+      }
+      playClick() {
+        if (!this.enabled) return;
+        const osc = this.audioContext.createOscillator();
+        const gain = this.audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(this.audioContext.destination);
+        osc.frequency.value = 800;
+        gain.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+        osc.start(this.audioContext.currentTime);
+        osc.stop(this.audioContext.currentTime + 0.1);
+      }
+      playSuccess() {
+        if (!this.enabled) return;
+        const notes = [523.25, 659.25, 783.99];
+        notes.forEach((freq, i) => {
+          setTimeout(() => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(this.audioContext.destination);
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.15, this.audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+            osc.start(this.audioContext.currentTime);
+            osc.stop(this.audioContext.currentTime + 0.2);
+          }, i * 100);
+        });
+      }
+      playError() {
+        if (!this.enabled) return;
+        const osc = this.audioContext.createOscillator();
+        const gain = this.audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(this.audioContext.destination);
+        osc.frequency.value = 300;
+        gain.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+        osc.start(this.audioContext.currentTime);
+        osc.stop(this.audioContext.currentTime + 0.2);
+      }
+      playVictory() {
+        if (!this.enabled) return;
+        const notes = [523.25, 659.25, 783.99, 1046.5];
+        notes.forEach((freq, i) => {
+          setTimeout(() => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(this.audioContext.destination);
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+            osc.start(this.audioContext.currentTime);
+            osc.stop(this.audioContext.currentTime + 0.3);
+          }, i * 150);
+        });
+      }
+    }
+
+    const sound = new SoundSystem();
+
+    // Particle Effects
+    function createConfetti(x, y) {
+      const emojis = ['✨', '⭐', '🌟', '💫', '🎉', '🎊'];
+      for (let i = 0; i < 8; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        confetti.style.left = x + 'px';
+        confetti.style.top = y + 'px';
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 800);
+      }
+    }
+
+    function bounceCombo() {
+      const comboCard = document.querySelector('.combo-card');
+      comboCard.classList.remove('bounce');
+      void comboCard.offsetWidth;
+      comboCard.classList.add('bounce');
+    }
+
+    function calculateRating() {
+      const totalTime = 45 - timeLeft;
+      const accuracy = Math.round((matchedPairs * 100) / totalPairs);
+      let stars = 1;
+
+      if (totalTime < 30 && maxComboReached >= 4) stars = 3;
+      else if (totalTime < 35 && maxComboReached >= 3) stars = 3;
+      else if (totalTime < 40) stars = 2;
+      else if (accuracy >= 80) stars = 2;
+      else stars = 1;
+
+      return Math.max(1, Math.min(3, stars));
+    }
+
+    function getAchievements() {
+      const achievements = [];
+      const totalTime = 45 - timeLeft;
+
+      if (totalTime < 15) achievements.push('⚡ Speedrun Master');
+      if (matchedPairs === totalPairs && moves <= totalPairs) achievements.push('🎯 Perfect Match');
+      if (maxComboReached === 5) achievements.push('🔥 Combo Max');
+      if (totalTime < 20) achievements.push('⏱️ Lightning Fast');
+
+      return achievements;
+    }
+
+    const gameAlertOverlay = document.getElementById('gameAlertOverlay');
+    const gameAlertIcon = document.getElementById('gameAlertIcon');
+    const gameAlertTitle = document.getElementById('gameAlertTitle');
+    const gameAlertContent = document.getElementById('gameAlertContent');
+    const gameAlertScore = document.getElementById('gameAlertScore');
+    const gameAlertScoreLabel = document.getElementById('gameAlertScoreLabel');
+    const gameAlertScoreValue = document.getElementById('gameAlertScoreValue');
+    const gameAlertScoreDetail = document.getElementById('gameAlertScoreDetail');
+    const gameAlertConfirm = document.getElementById('gameAlertConfirm');
+    let gameAlertAction = null;
+
+    function showGameAlert({ title, message = '', icon = '!', confirmText = 'Mengerti', scoreLabel, scoreValue, scoreDetail, onConfirm }) {
+      gameAlertIcon.textContent = icon;
+      gameAlertTitle.textContent = title;
+      gameAlertContent.textContent = message;
+      gameAlertConfirm.textContent = confirmText;
+      gameAlertAction = onConfirm || null;
+
+      const hasScore = Number.isFinite(scoreValue);
+      gameAlertScore.hidden = !hasScore;
+      if (hasScore) {
+        gameAlertScoreLabel.textContent = scoreLabel || 'Skor';
+        gameAlertScoreValue.textContent = String(scoreValue);
+        gameAlertScoreDetail.textContent = scoreDetail || '';
+      }
+
+      gameAlertOverlay.classList.add('show');
+      gameAlertConfirm.focus();
+    }
+
+    function closeGameAlert() {
+      const action = gameAlertAction;
+      gameAlertAction = null;
+      gameAlertOverlay.classList.remove('show');
+      if (action) action();
+    }
+
+    gameAlertConfirm.addEventListener('click', closeGameAlert);
+
+    function showWinScreen() {
+      clearInterval(timerInterval);
+      sound.playVictory();
+      createConfetti(window.innerWidth / 2, window.innerHeight / 2);
+
+      const totalTime = 45 - timeLeft;
+      const rating = calculateRating();
+      const achievements = getAchievements();
+      const accuracy = Math.round((matchedPairs * 100) / totalPairs);
+      const message = MOTIVATIONAL[Math.floor(Math.random() * MOTIVATIONAL.length)];
+
+      document.getElementById('winTitle').textContent = 'Level Selesai!';
+      document.getElementById('celebration').textContent = rating === 3 ? '🏆' : rating === 2 ? '🎯' : '👍';
+      document.getElementById('winMessage').textContent = message;
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('finalTime').textContent = totalTime + 's';
+      document.getElementById('maxCombo').textContent = 'x' + maxComboReached;
+      document.getElementById('accuracy').textContent = accuracy + '%';
+      document.getElementById('ratingStars').textContent = '⭐'.repeat(rating);
+
+      if (achievements.length > 0) {
+        document.getElementById('achievementsRow').style.display = 'block';
+        document.getElementById('achievementsList').innerHTML = achievements
+          .map(a => `<span class="achievement-badge">${a}</span>`)
+          .join('');
+      } else {
+        document.getElementById('achievementsRow').style.display = 'none';
+      }
+
+      if (currentLevel >= gameStats.levelsUnlocked && currentLevel < LEVELS.length) {
+        gameStats.levelsUnlocked = currentLevel + 1;
+        localStorage.setItem('memory_levelsUnlocked', gameStats.levelsUnlocked);
+        document.getElementById('nextLevelBtn').style.display = 'block';
+      } else if (currentLevel >= LEVELS.length) {
+        document.getElementById('nextLevelBtn').textContent = '🎮 Mainkan Lagi';
+        document.getElementById('nextLevelBtn').onclick = () => { currentLevel = 1; resetGame(); };
+      } else {
+        document.getElementById('nextLevelBtn').style.display = 'block';
+      }
+
+      gameStats.gamesWon++;
+      localStorage.setItem('memory_gamesWon', gameStats.gamesWon);
+      showGameAlert({
+        title: 'Semua Pasangan Berhasil!',
+        icon: '🏆',
+        confirmText: 'Lihat Hasil',
+        scoreLabel: 'Skor Akhir',
+        scoreValue: score,
+        scoreDetail: `Waktu ${totalTime}s · Combo Maks x${maxComboReached}`,
+        onConfirm: () => {
+          document.getElementById('modalOverlay').classList.add('show');
+        }
+      });
+    }
+
+    function nextLevel() {
+      currentLevel++;
+      document.getElementById('modalOverlay').classList.remove('show');
+      resetGame();
+    }
+
+    function retryGame() {
+      document.getElementById('modalOverlay').classList.remove('show');
+      resetGame();
+    }
+
+    function isGameModalOpen() {
+      return gameAlertOverlay.classList.contains('show') || document.getElementById('modalOverlay').classList.contains('show');
+    }
+
+    function updateStats() {
+      timerEl.textContent = formatTime(timeLeft);
+      scoreEl.textContent = score;
+      comboEl.textContent = `x${combo}`;
+      comboLargeEl.textContent = `x${combo}`;
+      comboBonusEl.textContent = `+${combo * 25}`;
+      levelEl.textContent = currentLevel;
+      targetEl.textContent = totalPairs;
+      openedEl.textContent = matchedPairs;
+      bestScoreEl.textContent = bestScore;
+      document.getElementById('levelIndicator').textContent = `Level ${currentLevel}`;
+
+      if (timeLeft <= 10 && timeLeft > 0) {
+        timerEl.parentElement.style.color = 'var(--orange)';
+      } else {
+        timerEl.parentElement.style.color = 'var(--text)';
+      }
+    }
+
+    function shuffle(array) {
+      const clone = [...array];
+      for (let i = clone.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [clone[i], clone[j]] = [clone[j], clone[i]];
+      }
+      return clone;
+    }
+
+    function createDeck() {
+      const uniqueAssets = assetList.slice(0, totalPairs);
+      const cards = uniqueAssets.flatMap((image, index) => [
+        { id: `${index}-${Math.random()}`, image, pairId: index },
+        { id: `${index}-copy-${Math.random()}`, image, pairId: index }
+      ]);
+      return shuffle(cards);
+    }
+
+    function rebuildBoard() {
+      board.innerHTML = '';
+
+      deck.forEach((card) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'tile';
+        btn.dataset.pairId = String(card.pairId);
+        btn.dataset.cardId = card.id;
+        btn.innerHTML = `
+            <span class="back"><span class="qmark">?</span></span>
+            <span class="front"><img src="${card.image}" alt="memory card" /></span>
+          `;
+        btn.addEventListener('click', () => handleCardClick(btn));
+        board.appendChild(btn);
+      });
+    }
+
+    function handleCardClick(cardEl) {
+      if (gameLocked || cardEl.classList.contains('is-flipped') || cardEl.classList.contains('is-matched')) {
+        return;
+      }
+
+      sound.playClick();
+      cardEl.classList.add('is-flipped');
+      selectedCards.push(cardEl);
+      moves++;
+
+      if (selectedCards.length === 2) {
+        gameLocked = true;
+        const [first, second] = selectedCards;
+        const isMatch = first.dataset.pairId === second.dataset.pairId;
+
+        if (isMatch) {
+          sound.playSuccess();
+          setTimeout(() => {
+            first.classList.add('is-matched');
+            second.classList.add('is-matched');
+            matchedPairs += 1;
+            combo = Math.min(combo + 1, 5);
+            maxComboReached = Math.max(maxComboReached, combo);
+            score += 100 * combo;
+
+            bounceCombo();
+            const rect = first.getBoundingClientRect();
+            createConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+            if (matchedPairs === totalPairs) {
+              bestScore = Math.max(bestScore, score);
+              localStorage.setItem('memory_best_score', String(bestScore));
+              setTimeout(showWinScreen, 500);
+            }
+
+            selectedCards = [];
+            gameLocked = false;
+            updateStats();
+          }, 350);
+        } else {
+          sound.playError();
+          combo = 1;
+          setTimeout(() => {
+            first.classList.remove('is-flipped');
+            second.classList.remove('is-flipped');
+            selectedCards = [];
+            gameLocked = false;
+            updateStats();
+          }, 700);
+        }
+
+        updateStats();
+      }
+    }
+
+    function showTimeoutAlert() {
+      gameLocked = true;
+      showGameAlert({
+        title: 'Waktu Habis!',
+        icon: '⏱',
+        scoreLabel: 'Skor Kamu',
+        scoreValue: score,
+        scoreDetail: 'Permainan dimulai ulang setelah kamu menekan Mengerti.',
+        onConfirm: resetGame
+      });
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft -= 1;
+          updateStats();
+          if (timeLeft === 10) sound.playClick();
+        } else {
+          clearInterval(timerInterval);
+          showTimeoutAlert();
+        }
+      }, 1000);
+    }
+
+    function resetGame() {
+      const levelConfig = LEVELS[Math.min(currentLevel - 1, LEVELS.length - 1)];
+      totalPairs = levelConfig.pairs;
+      timeLeft = levelConfig.time;
+
+      deck = createDeck();
+      selectedCards = [];
+      matchedPairs = 0;
+      gameLocked = false;
+      combo = 1;
+      maxComboReached = 1;
+      score = 0;
+      moves = 0;
+      document.getElementById('modalOverlay').classList.remove('show');
+
+      rebuildBoard();
+      updateStats();
+      startTimer();
+
+      gameStats.gamesPlayed++;
+      localStorage.setItem('memory_gamesPlayed', gameStats.gamesPlayed);
+    }
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      if (!isGameModalOpen()) resetGame();
+    });
+
+    document.getElementById('shuffleBtn').addEventListener('click', () => {
+      if (!isGameModalOpen()) resetGame();
+    });
+
+    document.getElementById('helpBtn').addEventListener('click', () => {
+      showGameAlert({
+        title: 'Cara Bermain',
+        message: 'Klik dua kartu untuk mencari pasangan yang sama.\n\nCocok: skor dan combo bertambah.\nTidak cocok: combo kembali ke awal.\nSelesaikan permainan sebelum waktu habis.',
+        icon: '?'
+      });
+    });
+
+    document.getElementById('difficultyBtn').addEventListener('click', () => {
+      if (isGameModalOpen()) return;
+
+      if (currentLevel < LEVELS.length) {
+        currentLevel++;
+        resetGame();
+      } else {
+        showGameAlert({
+          title: 'Level Maksimal',
+          message: 'Kamu sudah mencapai level tertinggi. Tantang dirimu untuk mendapatkan skor terbaik!',
+          icon: '★',
+          confirmText: 'Lanjut Main'
+        });
+      }
+    });
+
+    // Audio toggle
+    const audioBtn = document.querySelector('.icon-btn');
+    audioBtn.addEventListener('click', () => {
+      sound.enabled = !sound.enabled;
+      audioBtn.textContent = sound.enabled ? '🔊' : '🔇';
+    });
+
+    function startGame() {
+      document.getElementById('splashScreen').classList.add('hidden');
+      resetGame();
+    }
+
+    updateStats();
+  </script>
+</body>
+
+</html>

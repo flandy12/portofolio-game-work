@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIQUIP Tantangan Drop Presisi</title>
+    <meta
+        name="description"
+        content="Game tantangan drop interaktif UNIQUIP dengan visual industri dan penilaian berbasis presisi."
+    >
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="brand-block">
+                <span class="brand-mark">UNIQUIP</span>
+                <h1>TANTANGAN DROP PRESISI</h1>
+            </div>
+
+            <div class="topbar-actions">
+                <label class="difficulty-control" for="difficultyLevelInput">
+                    <span>TINGKAT 1-10</span>
+                    <input
+                        id="difficultyLevelInput"
+                        class="utility-button difficulty-input"
+                        type="number"
+                        min="1"
+                        max="10"
+                        step="1"
+                        inputmode="numeric"
+                        value="5"
+                    >
+                </label>
+
+                <button
+                    id="soundToggleBtn"
+                    class="utility-button"
+                    type="button"
+                    aria-pressed="true"
+                >
+                    SUARA AKTIF
+                </button>
+
+                <button
+                    id="howToPlayBtn"
+                    class="utility-button"
+                    type="button"
+                >
+                    CARA BERMAIN
+                </button>
+            </div>
+        </header>
+
+        <main class="game-layout">
+            <section class="game-frame" aria-label="UNIQUIP Tantangan Drop Presisi">
+                <div class="hud">
+                    <article class="hud-card">
+                        <span class="hud-label">PERCOBAAN</span>
+                        <strong id="attemptValue" class="hud-value">1 / 3</strong>
+                    </article>
+
+                    <article class="hud-card">
+                        <span class="hud-label">STOK HADIAH</span>
+                        <strong id="stockValue" class="hud-value">0 TERSISA</strong>
+                    </article>
+
+                    <article class="hud-card">
+                        <span class="hud-label">SKOR</span>
+                        <strong id="scoreValue" class="hud-value">0</strong>
+                    </article>
+                </div>
+
+                <div id="gameStage" class="game-stage" data-state="idle">
+                    <div class="stage-scene" aria-hidden="true">
+                        <div class="scene-sky"></div>
+                        <div class="scene-mountains scene-mountains-back"></div>
+                        <div class="scene-mountains scene-mountains-front"></div>
+                        <div class="scene-road"></div>
+                        <div class="scene-lane"></div>
+                        <div class="scene-machine scene-machine-left"></div>
+                        <div class="scene-machine scene-machine-right"></div>
+                        <div class="scene-dust"></div>
+                    </div>
+
+                    <div class="stage-overlay"></div>
+
+                    <div
+                        id="landingScreen"
+                        class="landing-screen"
+                        aria-live="polite"
+                    >
+                        <div class="landing-card">
+                            <h2>Hentikan hadiah yang jatuh tepat di dalam zona target.</h2>
+                            <p>
+                                Perhatikan hadiah yang turun, tekan <strong>BERHENTI</strong>
+                                pada saat yang tepat, dan raih skor presisi tertinggi.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        id="countdownOverlay"
+                        class="countdown-overlay hidden"
+                        aria-live="assertive"
+                    ></div>
+
+                    <div
+                        id="resultBadge"
+                        class="result-badge hidden"
+                        aria-live="polite"
+                    ></div>
+
+                    <div id="targetZone" class="target-zone is-hidden" aria-label="Target drop">
+                        <div class="target-ring target-ring-outer"></div>
+                        <div class="target-ring target-ring-middle"></div>
+                        <div class="target-ring target-ring-inner"></div>
+                        <div class="target-core"></div>
+                    </div>
+
+                    <div
+                        id="particlesLayer"
+                        class="particles-layer"
+                        aria-hidden="true"
+                    ></div>
+
+                    <div
+                        id="fallingProduct"
+                        class="falling-product hidden"
+                        aria-live="off"
+                    >
+                        <img
+                            id="productImage"
+                            src=""
+                            alt=""
+                            draggable="false"
+                        >
+                        <span id="productLabel" class="product-label"></span>
+                    </div>
+                </div>
+
+                <div class="control-panel">
+                    <button id="mainActionBtn" class="primary-button" type="button">
+                        MULAI GAME
+                    </button>
+
+                    <button
+                        id="resetDataBtn"
+                        class="secondary-button developer-only"
+                        type="button"
+                        hidden
+                    >
+                        ATUR ULANG DATA
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div
+        id="modalBackdrop"
+        class="modal-backdrop hidden"
+        aria-hidden="true"
+    >
+        <section
+            class="modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modalTitle"
+        >
+            <button
+                id="modalCloseBtn"
+                class="modal-close"
+                type="button"
+                aria-label="Tutup dialog"
+            >
+                ×
+            </button>
+            <div id="modalBody" class="modal-body"></div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

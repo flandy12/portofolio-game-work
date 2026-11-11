@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Game meracik burger sesuai gambar sebelum waktu habis.">
+  <title>Burger Blenger — Burger Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#builder" aria-label="Burger Blenger beranda">
+      <span class="brand-mark" aria-hidden="true">🍔</span>
+      <span>Burger<br><b>Blenger</b></span>
+    </a>
+    <div class="stepper game-status" aria-label="Status tantangan">
+      <span class="status-pill"><small>LEVEL</small><b id="levelStatus">Mudah</b></span>
+      <i></i>
+      <span class="timer-pill" id="timerPill"><small>WAKTU</small><b id="timerDisplay">30</b><em>detik</em></span>
+    </div>
+    <div class="score-header" aria-label="Skor terbaik">
+      <span>Skor terbaik</span>
+      <b id="bestScore">0</b>
+    </div>
+  </header>
+
+  <main>
+    <section class="builder" id="builder" aria-labelledby="gameTitle">
+      <div class="game-control-bar">
+        <div>
+          <p class="eyebrow">BURGER MEMORY CHALLENGE</p>
+          <h1 id="gameTitle">Racik sebelum waktu habis!</h1>
+          <p>Lihat burger pesanan, ingat susunannya, lalu buat burger yang sama.</p>
+        </div>
+        <div class="game-settings" aria-label="Pengaturan permainan">
+          <label for="difficultySelect">Kesulitan
+            <select id="difficultySelect">
+              <option value="easy">Mudah</option>
+              <option value="normal">Normal</option>
+              <option value="hard">Sulit</option>
+            </select>
+          </label>
+          <label for="timeSelect">Waktu
+            <select id="timeSelect">
+              <option value="15">15 detik</option>
+              <option value="20">20 detik</option>
+              <option value="25">25 detik</option>
+              <option value="30" selected>30 detik</option>
+            </select>
+          </label>
+          <button class="secondary-button" id="newChallengeButton" type="button">Pesanan baru</button>
+        </div>
+      </div>
+
+      <div class="round-banner" id="roundBanner" aria-live="polite">
+        <span class="round-dot"></span>
+        <b id="roundMessage">Lihat pesanan untuk memulai permainan.</b>
+        <button id="peekButton" type="button">Lihat target</button>
+      </div>
+
+      <div class="builder-grid">
+        <div class="preview-panel">
+          <div class="kitchen-scene" id="dropZone" aria-label="Letakkan bahan di dalam box burger">
+            <img class="kitchen-bg" src="asset/background/Kotak Burger Blenger Kosong di Dapur Profesional.png" alt="Kotak Burger Blenger di dapur">
+            <div class="ingredient-table" id="ingredientTable" aria-label="Pilihan bahan di atas meja"></div>
+            <div class="burger-stack" id="burgerStack" aria-label="Burger buatanmu"></div>
+            <div class="drop-prompt" aria-hidden="true"><span>↓</span><b>Lepaskan di sini</b><small>untuk menambah bahan</small></div>
+            <div class="preview-tip"><span>☝</span> Seret bahan ke dalam box</div>
+          </div>
+          <div class="live-summary">
+            <div><small>BURGER BUATANMU</small><strong id="burgerNamePreview">Belum diracik</strong></div>
+            <div><small>SKOR MAKSIMAL</small><strong id="liveScore">100 poin</strong></div>
+          </div>
+        </div>
+
+        <div class="customizer">
+          <div class="size-block">
+            <div class="section-title"><span>01</span><div><h3>Pilih ukuran</h3><p>Perhatikan jumlah patty pada target</p></div></div>
+            <div class="size-options" id="sizeOptions"></div>
+          </div>
+          <div class="ingredient-block">
+            <div class="section-title"><span>02</span><div><h3>Susun bahan</h3><p>Drag ke box atau klik untuk menambah</p></div></div>
+            <div class="category-tabs" id="categoryTabs" role="tablist"></div>
+            <div class="ingredients" id="ingredients"></div>
+            <div class="selected-toppings" id="selectedToppings" aria-live="polite"></div>
+          </div>
+          <button class="primary-button" id="submitButton" type="button"><span>Sajikan burger</span><strong>✓</strong></button>
+          <p class="tax-note">Pastikan ukuran, patty, roti, dan topping sesuai target.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="challengeModal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <section class="challenge-sheet" role="dialog" aria-modal="true" aria-labelledby="challengeTitle">
+      <p class="modal-kicker" id="challengeDifficulty">LEVEL MUDAH</p>
+      <h2 id="challengeTitle">Ingat burger ini!</h2>
+      <p class="modal-copy">Perhatikan ukuran, jumlah patty, dan semua toppingnya.</p>
+      <div class="target-stage"><div class="target-burger-stack" id="targetBurgerStack" aria-label="Burger target"></div></div>
+      <div class="challenge-meta">
+        <span><small>NAMA MENU</small><b id="targetName">Classic Challenge</b></span>
+        <span><small>BATAS WAKTU</small><b><i id="targetTime">30</i> detik</b></span>
+      </div>
+      <button class="primary-button modal-action" id="startButton" type="button"><span>Mulai meracik</span><strong>→</strong></button>
+      <p class="memory-note">Target akan ditutup ketika permainan dimulai.</p>
+    </section>
+  </div>
+
+  <div class="modal" id="resultModal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <section class="result-sheet" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <div class="result-icon" id="resultIcon" aria-hidden="true">🎉</div>
+      <p class="modal-kicker" id="resultKicker">TANTANGAN SELESAI</p>
+      <h2 id="resultTitle">Burger sempurna!</h2>
+      <p class="modal-copy" id="resultMessage"></p>
+      <div class="result-score"><span>SKOR</span><strong id="resultScore">100</strong><small>/ 100</small></div>
+      <div class="score-breakdown" id="scoreBreakdown"></div>
+      <div class="result-feedback" id="resultFeedback"></div>
+      <div class="result-actions">
+        <button class="secondary-button" id="retryButton" type="button">Coba lagi</button>
+        <button class="primary-button" id="nextButton" type="button"><span>Menu berikutnya</span><strong>→</strong></button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>

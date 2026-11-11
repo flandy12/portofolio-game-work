@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#070812" />
+    <meta name="description" content="Gesture Hoop — arcade basket berbasis gesture tangan." />
+    <title>Gesture Hoop — Aim. Charge. Shoot.</title>
+    <script type="module" crossorigin src="./assets/index-DmwsHHox.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/three-CsCz_b4S.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-T5h4G8nf.css">
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas" aria-label="Arena basket 3D"></canvas>
+      <div class="grain"></div>
+
+      <header class="brandbar">
+        <a class="brand" href="#" aria-label="Gesture Hoop home"><span class="brand-ball">●</span> GESTURE<span>HOOP</span></a>
+        <div class="camera-status" id="camera-status"><i></i><span>CAMERA OFFLINE</span></div>
+      </header>
+
+      <main>
+        <section class="screen active" id="attract-screen">
+          <div class="hero-copy">
+            <p class="eyebrow">GESTURE-CONTROLLED BASKETBALL</p>
+            <h1>AIM.<br><em>CHARGE.</em><br>SHOOT.</h1>
+            <p class="hero-sub">Jadilah MVP dalam 45 detik. Kamera membaca tanganmu—tanpa controller.</p>
+            <div class="hero-actions">
+              <button class="primary-btn" id="start-btn"><span>MAIN SEKARANG</span><b>↗</b></button>
+              <button class="text-btn" id="how-btn">CARA MAIN <span>→</span></button>
+            </div>
+            <p class="fallback-note">Tidak ada kamera? Mouse dan keyboard tetap bisa dipakai.</p>
+          </div>
+          <div class="hero-stat">
+            <span>SESSION</span><strong>00:45</strong><small>TO BECOME LEGEND</small>
+          </div>
+        </section>
+
+        <section class="screen" id="select-screen">
+          <div class="panel-heading"><p class="eyebrow">CHOOSE YOUR PLAYSTYLE</p><h2>PILIH <em>ROLE</em></h2><p>Setiap pemain punya ritme. Tidak ada pilihan yang salah.</p></div>
+          <div class="role-grid" id="role-grid"></div>
+          <button class="primary-btn select-confirm" id="confirm-role" disabled><span>PILIH KARAKTER DULU</span><b>→</b></button>
+        </section>
+
+        <section class="screen" id="countdown-screen" aria-live="assertive">
+          <p>GET READY</p><strong id="countdown-value">3</strong><span id="countdown-role"></span>
+        </section>
+
+        <section class="screen" id="game-screen">
+          <div class="hud top-hud">
+            <div class="hud-block"><small>SCORE</small><strong id="score">000000</strong></div>
+            <div class="timer-wrap"><small>TIME LEFT</small><strong id="timer">45.0</strong><div class="timer-track"><i id="timer-bar"></i></div></div>
+            <div class="hud-block right"><small>COMBO</small><strong id="combo">×1</strong></div>
+          </div>
+          <div id="difficulty" class="difficulty">ROOKIE</div>
+          <div id="feedback" class="feedback" aria-live="polite"></div>
+          <div class="aim-reticle" id="reticle"><i></i></div>
+          <div class="hud bottom-hud">
+            <div class="player-card"><div id="role-avatar">S</div><p><small>PLAYER ROLE</small><strong id="role-name">SNIPER</strong></p></div>
+            <div class="power-wrap"><div class="power-label"><span>SHOT POWER</span><b id="power-value">0%</b></div><div class="power-track"><i id="power-bar"></i></div><small id="gesture-hint">ARAHKAN TELUNJUK • PINCH UNTUK CHARGE</small></div>
+            <button class="skill-btn" id="skill-btn"><small>SPECIAL</small><strong id="skill-name">PRECISION</strong><span>THUMBS UP / SPACE</span></button>
+          </div>
+          <video id="webcam" autoplay muted playsinline></video>
+          <canvas id="hand-overlay"></canvas>
+        </section>
+
+        <section class="screen" id="result-screen">
+          <div class="result-card">
+            <p class="eyebrow">FINAL BUZZER</p><h2>GAME <em>OVER</em></h2>
+            <div class="final-score"><small>FINAL SCORE</small><strong id="final-score">0</strong><span id="new-best">NEW PERSONAL BEST</span></div>
+            <div class="result-stats"><div><small>ACCURACY</small><b id="accuracy">0%</b></div><div><small>BEST COMBO</small><b id="best-combo">0</b></div><div><small>PERFECT</small><b id="perfect-count">0</b></div></div>
+            <div id="achievements" class="achievement-list"></div>
+            <div class="name-entry"><label for="player-name">NAMA PEMAIN</label><input id="player-name" maxlength="16" autocomplete="off" placeholder="ROOKIE" value="ROOKIE"><button id="save-score">SIMPAN</button></div>
+            <div class="result-actions"><button class="primary-btn" id="replay-btn"><span>MAIN LAGI</span><b>↻</b></button><button class="text-btn" id="leaderboard-btn">LEADERBOARD →</button></div>
+          </div>
+        </section>
+
+        <section class="screen" id="leaderboard-screen">
+          <div class="panel-heading"><p class="eyebrow">LOCAL HALL OF FAME</p><h2>TOP <em>PLAYERS</em></h2></div>
+          <ol id="leaderboard-list" class="leaderboard-list"></ol>
+          <button class="primary-btn" id="leaderboard-back"><span>KEMBALI</span><b>←</b></button>
+        </section>
+      </main>
+
+      <dialog id="how-dialog">
+        <button class="dialog-close" id="dialog-close" aria-label="Tutup">×</button>
+        <p class="eyebrow">3 GERAKAN. 1 TUJUAN.</p><h2>CARA <em>MAIN</em></h2>
+        <div class="steps"><article><b>01</b><h3>AIM</h3><p>Arahkan telunjuk untuk membidik ring.</p></article><article><b>02</b><h3>CHARGE</h3><p>Satukan ibu jari dan telunjuk untuk mengisi power.</p></article><article><b>03</b><h3>RELEASE</h3><p>Lepaskan pinch untuk menembak.</p></article></div>
+        <p class="keyboard-help">Fallback: gerakkan mouse untuk membidik, tahan klik untuk charge, lalu lepaskan. Tekan <kbd>Space</kbd> untuk skill.</p>
+      </dialog>
+      <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+    </div>
+  </body>
+</html>

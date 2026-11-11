@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stop Produk Beauty Game</title>
+
+<script src="./main.css"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        /* =========================
+   BODY
+========================= */
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+
+            min-height: 100vh;
+
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(circle at center,
+                    #ffe4ec 0%,
+                    #f8a1b8 40%,
+                    #f06292 70%,
+                    #d94f7a 100%);
+        }
+
+        /* =========================
+   GAME SCALE
+========================= */
+
+        .game-wrapper {
+            width: 900px;
+            height: 1500px;
+
+            transform-origin: top center;
+
+            transform:
+                scale(min(calc(100vw / 900), calc(100vh / 1500)));
+
+        }
+
+        /* =========================
+   MAIN BACKGROUND
+========================= */
+
+        .bg-master {
+            background: url('./asset/bg-4.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+
+            width: 900px;
+            height: stretch;
+            position: relative;
+
+            overflow: hidden;
+
+            padding: 80px;
+
+            flex-shrink: 0;
+        }
+
+        /* =========================
+   BACKGROUND FX
+========================= */
+
+        body::before {
+            content: "";
+
+            position: fixed;
+            inset: 0;
+
+            background:
+                repeating-linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0.15) 0px,
+                    rgba(255, 255, 255, 0.05) 2px,
+                    transparent 6px,
+                    transparent 40px);
+
+            opacity: 0.4;
+
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "";
+
+            position: fixed;
+            inset: 0;
+
+            background-image:
+                radial-gradient(circle,
+                    rgba(255, 255, 255, 0.8) 1px,
+                    transparent 2px),
+
+                radial-gradient(circle,
+                    rgba(255, 215, 180, 0.6) 1px,
+                    transparent 3px);
+
+            background-size: 120px 120px, 200px 200px;
+
+            animation: sparkleMove 10s linear infinite;
+
+            opacity: 0.5;
+
+            pointer-events: none;
+        }
+
+        @keyframes sparkleMove {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-200px);
+            }
+        }
+
+        /* =========================
+   GAME AREA
+========================= */
+
+        .bg-side-glow {
+            position: relative;
+
+            width: 100%;
+            height: 1050px;
+
+            border-radius: 40px;
+
+            overflow: hidden;
+
+            margin-top: 120px;
+
+            background:
+                linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0.08),
+                    rgba(255, 255, 255, 0.02));
+        }
+
+        .bg-side-glow::before,
+        .bg-side-glow::after {
+            content: "";
+
+            position: absolute;
+            top: 0;
+
+            width: 40%;
+            height: 100%;
+
+            background:
+                radial-gradient(circle at center,
+                    rgba(255, 255, 255, 0.3),
+                    transparent 70%);
+
+            filter: blur(40px);
+
+            pointer-events: none;
+        }
+
+        .bg-side-glow::before {
+            left: -10%;
+        }
+
+        .bg-side-glow::after {
+            right: -10%;
+        }
+
+        /* =========================
+   FALLING PRODUCT
+========================= */
+
+        #product {
+            position: absolute;
+
+            left: 50%;
+            top: 0;
+
+            z-index: 20;
+
+            transform:
+                translateX(-50%) translateY(-220px);
+
+            will-change: transform;
+        }
+
+        #product img {
+            width: 220px;
+
+            display: block;
+
+            filter:
+                drop-shadow(0 0 20px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 40px rgba(255, 120, 180, 0.5));
+        }
+
+        /* =========================
+   ZONE TARGET
+========================= */
+
+        #zone {
+            position: absolute;
+
+            left: 51%;
+            bottom: 185px;
+
+            transform: translateX(-50%);
+
+            width: 280px;
+            height: 280px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            z-index: 5;
+        }
+
+        .zone-glow {
+            position: absolute;
+
+            width: 280px;
+            height: 280px;
+
+            border-radius: 50%;
+
+            top: 50%;
+            left: 50%;
+
+            transform: translate(-50%, -50%);
+
+            background:
+                radial-gradient(circle,
+                    rgba(255, 255, 255, 0.45),
+                    rgba(255, 120, 180, 0.15),
+                    transparent 70%);
+
+            filter: blur(20px);
+
+            animation: zonePulse 1.5s infinite alternate;
+        }
+
+        .zone-ring {
+            position: absolute;
+
+            width: 277px;
+            height: 268px;
+
+            border-radius: 50%;
+
+            top: 50%;
+            left: 50%;
+
+            transform: translate(-50%, -50%);
+
+            border: 6px dashed rgba(255, 255, 255, 0.9);
+
+            box-shadow:
+                0 0 25px rgba(255, 255, 255, 0.7),
+                0 0 60px rgba(255, 120, 180, 0.6);
+
+            animation: rotateRing 8s linear infinite;
+        }
+
+        #zone img {
+            width: 180px;
+
+            position: relative;
+            z-index: 10;
+
+            filter:
+                drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+        }
+
+        @keyframes rotateRing {
+
+            from {
+                transform:
+                    translate(-50%, -50%) rotate(0deg);
+            }
+
+            to {
+                transform:
+                    translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @keyframes zonePulse {
+
+            from {
+                transform:
+                    translate(-50%, -50%) scale(0.95);
+
+                opacity: 0.6;
+            }
+
+            to {
+                transform:
+                    translate(-50%, -50%) scale(1.08);
+
+                opacity: 1;
+            }
+        }
+
+        /* =========================
+   BUTTON
+========================= */
+
+        #btn {
+            height: 140px;
+
+            cursor: pointer;
+
+            transition: 0.25s ease;
+        }
+
+        #btn:hover {
+            transform: scale(1.05);
+        }
+
+        #btn:active {
+            transform: scale(0.96);
+        }
+
+        /* =========================
+   RESULT
+========================= */
+
+        #result {
+            z-index: 100;
+
+            position: absolute;
+
+            top: 25%;
+            left: 50%;
+
+        }
+
+        #result img {
+            animation: popup .3s ease;
+        }
+
+        @keyframes popup {
+
+            from {
+                transform: scale(.7);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* =========================
+   RESULT MODAL
+========================= */
+
+        #result {
+            position: absolute;
+
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background: rgba(0, 0, 0, 0.332);
+
+            z-index: 100;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            backdrop-filter: blur(6px);
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition: 0.3s ease;
+        }
+
+        /* SHOW MODAL */
+        #result.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* CONTENT */
+        #berhasil,
+        #gagal {
+            position: relative;
+
+            z-index: 101;
+
+            animation: popup .3s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="w-[950px] relative bg-master px-[100px] py-[100px]">
+
+        <!-- HEADER -->
+        <div class="flex justify-between mb-4">
+
+            <div class="relative">
+                <img src="./asset/WAKTU.png" class="h-20 inline-block">
+
+                <span id="time" class="text-[#f7357d] font-bold text-2xl ml-2 absolute top-[30px] left-[65px]">
+                    00:30
+                </span>
+            </div>
+
+        </div>
+
+        <!-- GAME AREA -->
+        <div class="relative rounded-3xl overflow-hidden bg-side-glow">
+
+            <!-- FALLING PRODUCT -->
+            <div id="product" class="absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
+
+                    <img src="./asset/serum.png">
+
+            </div>
+
+            <!-- ZONE -->
+            <div id="zone">
+
+                <div class="zone-glow"></div>
+
+                <div class="zone-ring"></div>
+
+                    <img src="./asset/serum.png">
+
+            </div>
+
+        </div>
+
+        <!-- BUTTON -->
+        <div class="flex justify-center mt-6">
+                <img src="./asset/start-btn.png" id="btn">
+        </div>
+
+        <!-- RESULT MODAL -->
+        <div id="result">
+
+            <!-- SUCCESS -->
+            <div id="berhasil" class="relative hidden">
+
+                <img src='./asset/success-wrapping.png' class='mx-auto mb-4' />
+
+                <img src='./asset/lanjutkan.png' class='mx-auto w-[230px] absolute bottom-12 left-20 cursor-pointer'
+                    id="lanjutkan" />
+
+            </div>
+
+            <!-- FAIL -->
+            <div id="gagal" class="relative hidden">
+
+                <img id="gagal-image" src='./asset/try-again-wrapping.png' class='mx-auto mb-4' />
+
+                <img src='./asset/try-again.png'
+                    class='mx-auto w-[230px] absolute bottom-12 left-20 cursor-pointer z-100' id="try-again" />
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        let isRunning = false
+
+        let positionY = -220
+        let velocity = 0
+
+        /* =========================
+                GAME SETTINGS
+        ========================= */
+
+        // EASY MODE BALANCED
+        const GAME_SETTINGS = {
+
+            /* KECEPATAN TURUN */
+            gravity: 0.8,
+
+            /* BATAS KECEPATAN MAKSIMAL */
+            maxVelocity: 6,
+
+            /* RANDOM SPEED */
+            randomGravity: 0.02,
+            randomVelocity: 1,
+
+            /* TINGKAT KESULITAN */
+            perfectHit: 40,
+            goodHit: 80,
+
+            /* RANDOM SHAKE */
+            randomShake: 0.3,
+
+            /* SPEED MULTIPLIER */
+            speedMultiplier: 1.03
+        }
+        // MEDIUM MODE
+        //         const GAME_SETTINGS = {
+
+        //     /* KECEPATAN TURUN */
+        //     gravity: 0.7,
+
+        //     /* BATAS KECEPATAN MAKSIMAL */
+        //     maxVelocity: 12,
+
+        //     /* RANDOM SPEED */
+        //     randomGravity: 0.08,
+        //     randomVelocity: 5,
+
+        //     /* TINGKAT KESULITAN */
+        //     perfectHit: 22,
+        //     goodHit: 50,
+
+        //     /* RANDOM SHAKE */
+        //     randomShake: 1.2,
+
+        //     /* SPEED MULTIPLIER */
+        //     speedMultiplier: 1.08
+        // }
+
+
+        // HARD MODE
+        // const GAME_SETTINGS = {
+
+        //     /* KECEPATAN TURUN */
+        //     gravity: 1.4,
+
+        //     /* BATAS KECEPATAN MAKSIMAL */
+        //     maxVelocity: 20,
+
+        //     /* RANDOM SPEED */
+        //     randomGravity: 0.15,
+        //     randomVelocity: 10,
+
+        //     /* TINGKAT KESULITAN */
+        //     perfectHit: 10,
+        //     goodHit: 25,
+
+        //     /* RANDOM SHAKE */
+        //     randomShake: 2.5,
+
+        //     /* SPEED MULTIPLIER */
+        //     speedMultiplier: 1.18
+        // }
+
+        let gravity =
+            GAME_SETTINGS.gravity
+
+        let maxVelocity =
+            GAME_SETTINGS.maxVelocity
+
+        let animationId = null
+
+        const product = document.getElementById('product')
+        const btn = document.getElementById('btn')
+        const result = document.getElementById('result')
+        const btnStop = document.getElementById('btn-stop')
+
+        const gameArea =
+            document.querySelector('.bg-side-glow')
+
+        const target =
+            document.getElementById('zone')
+
+        const tryAgainBtn = document.getElementById('try-again')
+
+        const continueBtn = document.getElementById('lanjutkan')
+
+        /* =========================
+TIMER
+========================= */
+
+        const timeElement =
+            document.getElementById('time')
+
+        let timeLeft = 30
+        let timerInterval = null
+
+        function updateTimerDisplay() {
+
+            const seconds =
+                String(timeLeft).padStart(2, '0')
+
+            timeElement.innerText =
+                `00:${seconds}`
+        }
+
+        function startTimer() {
+
+            clearInterval(timerInterval)
+
+            timeLeft = 30
+
+            updateTimerDisplay()
+
+            timerInterval = setInterval(() => {
+
+                timeLeft--
+
+                updateTimerDisplay()
+
+                /* WAKTU HABIS */
+                if (timeLeft <= 0) {
+
+                    clearInterval(timerInterval)
+
+                    isRunning = false
+
+                    cancelAnimationFrame(animationId)
+
+                    product.classList.add('hidden')
+
+                    showResult('timeout')
+                }
+
+            }, 1000)
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval)
+        }
+
+        /* =========================
+           RESET
+        ========================= */
+
+        function resetProduct() {
+
+            positionY = -220
+            velocity = 0
+
+            updatePosition()
+            result.classList.remove('show')
+        }
+
+        /* =========================
+           UPDATE POSITION
+        ========================= */
+
+        function updatePosition() {
+
+            product.style.transform =
+                `translateX(-50%) translateY(${positionY}px)`
+        }
+
+        /* =========================
+           ANIMATION
+        ========================= */
+
+        function animate() {
+
+            if (!isRunning) return
+
+            const areaHeight =
+                gameArea.clientHeight
+
+            const productHeight =
+                product.clientHeight
+
+            /* PHYSICS */
+            /* PHYSICS */
+            velocity += gravity * 0.20
+
+            if (velocity > maxVelocity) {
+                velocity = maxVelocity
+            }
+
+            positionY += velocity * 0.60
+
+            /* RESET */
+            if (positionY > areaHeight + 100) {
+                positionY = -250
+                velocity = 0
+            }
+
+            updatePosition()
+
+            animationId =
+                requestAnimationFrame(animate)
+        }
+
+        /* =========================
+           CHECK HIT
+        ========================= */
+
+        function checkHit() {
+
+            const p =
+                product.getBoundingClientRect()
+
+            const z =
+                target.getBoundingClientRect()
+
+            const pCenter =
+                p.top + p.height / 2
+
+            const zCenter =
+                z.top + z.height / 2
+
+            const diff =
+                Math.abs(pCenter - zCenter)
+
+            if (diff < 30) return 'PERFECT'
+
+            if (diff < 90) return 'GOOD'
+
+            return 'MISS'
+        }
+
+        /* =========================
+           BUTTON ACTION
+        ========================= */
+
+        btn.onclick = () => {
+
+            /* START */
+            if (!isRunning) {
+
+                btn.setAttribute('src', './asset/stop-btn.png');
+
+                resetProduct()
+
+                gravity =
+                    0.45 + Math.random()
+
+                maxVelocity =
+                    22 + Math.random()
+
+                isRunning = true
+
+                startTimer()
+
+                animate()
+            }
+
+            /* STOP */
+            else {
+
+                isRunning = false
+                btn.setAttribute('src', './asset/start-btn.png');
+
+                cancelAnimationFrame(animationId)
+
+                stopTimer()
+
+                const res = checkHit()
+
+                if (res === 'PERFECT' || res === 'GOOD') {
+
+                    showResult('success')
+
+                }
+                else {
+
+                    showResult('fail')
+                }
+            }
+        }
+
+        /* =========================
+   RESULT MODAL
+========================= */
+
+        const resultModal = document.getElementById('result')
+
+        function showResult(type) {
+
+            result.classList.add('show')
+            product.classList.add('hidden')
+
+            /* SUCCESS */
+            if (type === 'success') {
+
+                document
+                    .getElementById('berhasil')
+                    .classList.remove('hidden')
+            }
+
+            /* FAIL */
+            else if (type === 'fail') {
+
+                document
+                    .getElementById('gagal')
+                    .classList.remove('hidden')
+
+                document
+                    .getElementById('gagal-image')
+                    .src =
+                    './asset/try-again-wrapping.png'
+            }
+
+            /* TIMEOUT */
+            else if (type === 'timeout') {
+
+                document
+                    .getElementById('gagal')
+                    .classList.remove('hidden')
+
+                document
+                    .getElementById('gagal-image')
+                    .src =
+                    './asset/failed-wrapping.png'
+            }
+        }
+
+
+        tryAgainBtn.addEventListener('click', function () {
+
+            stopTimer();
+            timeElement.innerText =
+                `00:${timeLeft = 30}`;
+
+            document.getElementById('gagal').classList.add('hidden');
+            btn.classList.remove('hidden');
+            product.classList.remove('hidden');
+            gagal.classList.add('hidden');
+
+            resetProduct();
+        });
+
+        continueBtn.addEventListener('click', function () {
+
+            stopTimer();
+            timeElement.innerText =
+                `00:${timeLeft = 30}`;
+
+            document.getElementById('berhasil').classList.add('hidden');
+            btn.classList.remove('hidden');
+            product.classList.remove('hidden');
+            gagal.classList.add('hidden');
+
+            resetProduct();
+        });
+    </script>
+
+</body>
+
+</html>

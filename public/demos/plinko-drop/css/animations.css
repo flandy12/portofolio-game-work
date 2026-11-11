@@ -1,0 +1,4 @@
+@keyframes hero-drop { 0%,100% { transform:translate(0,0) rotate(0); } 20% { transform:translate(-74px,135px) rotate(120deg); } 42% { transform:translate(52px,250px) rotate(250deg); } 66% { transform:translate(-30px,380px) rotate(390deg); } 88% { transform:translate(65px,500px) rotate(540deg); } }
+@keyframes result-pop { 0% { opacity:0;transform:translate(-50%,-50%) scale(.45) } 16%,70% { opacity:1;transform:translate(-50%,-50%) scale(1) } 100% { opacity:0;transform:translate(-50%,-65%) scale(1.08) } }
+@keyframes pulse { 50% { opacity:.48; transform:scale(.98); } }
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}

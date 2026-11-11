@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#043d9e">
+  <meta name="description" content="Temukan lima perbedaan pada dua gambar sebelum waktu habis.">
+  <title>Find the Differences</title>
+  <link rel="preload" href="asset/campus-differences.png" as="image">
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <main class="game-shell">
+    <header class="topbar">
+      <button class="round-button" id="pauseButton" type="button" aria-label="Jeda permainan">Ⅱ</button>
+      <img class="logo" src="asset/logo.png" alt="Find the Differences — Temukan 5 perbedaan">
+      <div class="coin-pill" aria-label="Total koin"><span aria-hidden="true">★</span><strong id="coinCount">0</strong></div>
+    </header>
+    <section class="status-row" aria-label="Status permainan">
+      <div class="status-card timer-card"><span class="status-icon" aria-hidden="true">⏱</span><div><small>WAKTU</small><strong id="timer">01:30</strong></div></div>
+      <div class="status-card life-card"><div><small>NYAWA</small><div class="hearts" id="hearts" aria-label="3 nyawa"></div></div></div>
+    </section>
+    <section class="game-board" id="gameBoard" aria-label="Dua gambar untuk dibandingkan">
+      <div class="picture picture-left" data-panel="kiri" aria-label="Gambar kiri"></div>
+      <div class="picture picture-right" data-panel="kanan" aria-label="Gambar kanan"></div>
+    </section>
+    <section class="progress-card" aria-live="polite">
+      <div class="progress-copy"><strong><span id="foundCount">0</span> / 5</strong><span>PERBEDAAN DITEMUKAN</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="stars" id="stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+    </section>
+    <section class="actions" aria-label="Bantuan permainan">
+      <button class="action-button" id="hintButton" type="button"><span class="action-icon">💡</span><strong>PETUNJUK</strong><em id="hintCount">3</em></button>
+      <button class="action-button action-primary" id="timeButton" type="button"><span class="action-icon">🔎</span><strong>+30 DETIK</strong><em id="timeCount">1</em></button>
+      <button class="action-button" id="soundButton" type="button" aria-pressed="true"><span class="action-icon" id="soundIcon">🔊</span><strong>SUARA</strong></button>
+    </section>
+    <aside class="tip"><span aria-hidden="true">★</span><p><strong>Tip:</strong> Perhatikan detail kecil seperti warna, bentuk, dan posisi objek!</p></aside>
+  </main>
+  <div class="overlay" id="startOverlay" role="dialog" aria-modal="true" aria-labelledby="startTitle">
+    <div class="welcome-card"><img src="asset/logo.png" alt="" aria-hidden="true"><h1 id="startTitle">Siap Menemukan Perbedaannya?</h1><p>Temukan 5 perbedaan sebelum 90 detik habis. Klik pada gambar kiri atau kanan.</p><button class="orange-button" id="startButton" type="button"><span>▶</span> MULAI</button></div>
+  </div>
+  <div class="overlay is-hidden" id="pauseOverlay" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+    <div class="simple-modal"><div class="modal-symbol blue">Ⅱ</div><h2 id="pauseTitle">PERMAINAN DIJEDA</h2><p>Waktu berhenti sementara.</p><button class="blue-button" id="resumeButton" type="button">LANJUTKAN</button></div>
+  </div>
+  <div class="overlay is-hidden" id="resultOverlay" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <div class="simple-modal result-modal"><div class="ribbon" id="resultRibbon">HEBAT!</div><div class="modal-symbol" id="resultSymbol">★</div><h2 id="resultTitle">SELAMAT!</h2><p id="resultMessage">Kamu telah menemukan semua perbedaan.</p><div class="reward" id="reward"><span>★</span><b id="rewardValue">+50</b></div><div class="modal-actions"><button class="home-button" id="homeButton" type="button" aria-label="Kembali ke halaman awal">⌂</button><button class="orange-button" id="retryButton" type="button">COBA LAGI</button></div></div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="game.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17112d">
+  <meta name="description" content="Claw Machine Digital, game mesin capit arcade berbasis web.">
+  <title>Claw Machine Digital</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section id="welcomeScreen" class="screen welcome-screen" aria-labelledby="welcomeTitle">
+      <div class="welcome-stars" aria-hidden="true"></div>
+      <div class="welcome-card">
+        <p class="eyebrow">ARCADE PRIZE STATION</p>
+        <div class="mini-claw" aria-hidden="true">⌄</div>
+        <h1 id="welcomeTitle"><span>CLAW</span> MACHINE</h1>
+        <p class="welcome-copy">Arahkan capit, incar hadiah favoritmu, dan bawa pulang kemenangan!</p>
+        <div class="welcome-actions">
+          <button id="startButton" class="button button-primary" type="button">Mulai Game</button>
+          <button id="howToButton" class="button button-ghost" type="button">Cara Bermain</button>
+        </div>
+        <button id="resetDataButton" class="text-button" type="button">Reset data demo</button>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen game-screen" hidden aria-label="Area permainan claw machine">
+      <header class="game-header">
+        <div class="brand"><span class="brand-mark">C</span><span>CLAW LAB</span></div>
+        <div class="status-group" aria-live="polite">
+          <div id="timerCard" class="status-card"><span>WAKTU</span><strong id="timerValue">60</strong></div>
+          <div class="status-card"><span>KESEMPATAN</span><strong id="attemptsValue">3</strong></div>
+        </div>
+        <button id="soundButton" class="icon-button" type="button" aria-label="Matikan suara" aria-pressed="true">♪</button>
+      </header>
+
+      <div class="cabinet-wrap">
+        <div class="cabinet-top"><span>★</span><strong>LUCKY CLAW</strong><span>★</span></div>
+        <div id="machine" class="machine" tabindex="0" aria-label="Mesin capit. Gunakan tombol panah atau A dan D untuk bergerak, spasi untuk menjatuhkan capit.">
+          <div class="machine-glow" aria-hidden="true"></div>
+          <div class="rail" aria-hidden="true"></div>
+          <div id="clawAssembly" class="claw-assembly" aria-hidden="true">
+            <div id="clawRope" class="claw-rope"></div>
+            <div class="claw-head"><span></span></div>
+            <div id="claw" class="claw">
+              <i class="claw-arm claw-arm-left"></i>
+              <i class="claw-arm claw-arm-right"></i>
+            </div>
+          </div>
+          <div id="prizeField" class="prize-field" aria-hidden="true"></div>
+          <div class="floor-line"></div>
+          <div id="chute" class="chute"><span>PRIZE</span><div></div></div>
+          <div id="messageBubble" class="message-bubble" aria-live="polite">Pilih posisi yang tepat!</div>
+        </div>
+        <div class="cabinet-base">
+          <div class="coin-slot"><span></span> FREE PLAY</div>
+          <div class="controls" aria-label="Kontrol permainan">
+            <button id="leftButton" class="control-button move-button" type="button" aria-label="Gerak ke kiri">◀<small>KIRI</small></button>
+            <button id="dropButton" class="control-button drop-button" type="button"><span>DROP</span><small>TURUNKAN</small></button>
+            <button id="rightButton" class="control-button move-button" type="button" aria-label="Gerak ke kanan">▶<small>KANAN</small></button>
+          </div>
+          <div class="mode-label"><span id="modeValue">SKILL MODE</span><small>SPACE UNTUK DROP</small></div>
+        </div>
+      </div>
+    </section>
+
+    <dialog id="howToDialog" class="modal how-to-modal">
+      <button class="modal-close" data-close-dialog type="button" aria-label="Tutup">×</button>
+      <p class="eyebrow">CARA BERMAIN</p>
+      <h2>Tiga langkah menuju hadiah</h2>
+      <ol class="instruction-list">
+        <li><b>1</b><span><strong>Arahkan capit</strong>Gunakan tombol kiri/kanan, A/D, atau kontrol di layar.</span></li>
+        <li><b>2</b><span><strong>Tekan DROP</strong>Posisikan capit tepat di atas hadiah lalu turunkan.</span></li>
+        <li><b>3</b><span><strong>Menangkan hadiah</strong>Kamu punya tiga kesempatan sebelum waktu habis.</span></li>
+      </ol>
+      <button class="button button-primary" data-close-dialog type="button">Siap Bermain</button>
+    </dialog>
+
+    <dialog id="resultDialog" class="modal result-modal">
+      <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+      <div id="resultIcon" class="result-icon">🎁</div>
+      <p id="resultEyebrow" class="eyebrow">KAMU MENANG!</p>
+      <h2 id="resultTitle">Selamat!</h2>
+      <p id="resultText">Hadiah berhasil masuk ke prize chute.</p>
+      <div id="wonPrize" class="won-prize" hidden><span id="wonPrizeIcon"></span><strong id="wonPrizeName"></strong></div>
+      <button id="resultActionButton" class="button button-primary" type="button">Main Lagi</button>
+      <button id="backHomeButton" class="text-button" type="button">Kembali ke menu</button>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/prizes.js"></script>
+  <script src="js/collision.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/claw.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+@media (max-width: 720px) {
+  .app-shell { padding: 10px; align-items: start; }
+  .welcome-screen { min-height: calc(100dvh - 20px); }
+  .welcome-card { border-radius: 28px; }
+  .game-screen { padding-top: 4px; }
+  .brand span:last-child { display: none; }
+  .status-card { min-width: 84px; padding: 7px 9px; display: block; text-align: center; }
+  .status-card span { display: block; font-size: .51rem; }
+  .status-card strong { font-size: 1.1rem; }
+  .cabinet-top { height: 50px; border-width: 4px; border-bottom: 0; border-radius: 23px 23px 0 0; }
+  .machine { height: min(57dvh, 560px); min-height: 390px; border-width: 9px; border-bottom: 0; }
+  .message-bubble { font-size: .64rem; }
+  .cabinet-base { min-height: 135px; display: block; padding: 15px 8px 18px; border-width: 4px; border-radius: 0 0 24px 24px; }
+  .coin-slot, .mode-label { display: none; }
+  .move-button { width: 62px; height: 57px; }
+  .drop-button { width: 92px; height: 92px; }
+  .controls { gap: 18px; }
+  .prize-field { inset: 40% 4% 8% 4%; }
+  .chute { width: 24%; }
+}
+
+@media (max-height: 720px) and (orientation: landscape) {
+  .app-shell { padding: 8px; }
+  .game-header { margin-bottom: 6px; }
+  .machine { height: 50vh; min-height: 285px; }
+  .cabinet-top { height: 42px; }
+  .cabinet-base { min-height: 102px; padding-block: 9px; }
+  .drop-button { width: 78px; height: 78px; }
+  .move-button { width: 62px; height: 52px; }
+}

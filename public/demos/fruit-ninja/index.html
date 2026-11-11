@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Three.js Fruit Ninja</title>
+  <style>
+    :root {
+      --bg-deep: #3cc3ff;
+      --bg-mid: #4ec6ff;
+      --panel: rgba(255, 245, 214, 0.9);
+      --panel-border: rgba(80, 55, 30, 0.45);
+      --text: #1d2d3f;
+      --muted: #3d5168;
+      --green: #49d66d;
+      --green-soft: #8ae8ac;
+      --amber: #ffd93d;
+      --red: #ff5d5d;
+      --purple: #ff7ec9;
+      --cyan: #62d7ff;
+      --cream: #f5e7c4;
+      --yellow: #ffd93d;
+      --pink: #ff7ec9;
+      --shadow: 0 12px 0 rgba(18, 52, 84, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      overflow: hidden;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+    }
+
+    body {
+      position: relative;
+      touch-action: none;
+      background-image: url('./assets/bg-fruit-ninja.png');
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      background-attachment: fixed;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      object-fit: cover;
+    }
+
+    .ui-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      padding: clamp(10px, 2vw, 20px);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .hud,
+    .side-panel,
+    .mission-panel {
+      pointer-events: auto;
+      background: rgba(245, 231, 196, 0.95);
+      border: 3px solid var(--panel-border);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+      border-radius: 18px;
+    }
+
+    .hud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 18px;
+      min-width: 220px;
+      max-width: 420px;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: clamp(0.95rem, 1vw + 0.7rem, 1.4rem);
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .stat .value {
+      color: #ff7f50;
+      text-shadow: 0 0 12px rgba(255, 143, 92, 0.35);
+    }
+
+    .stat .lives {
+      color: #fca5a5;
+    }
+
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px 16px;
+      min-width: 220px;
+      max-width: 280px;
+    }
+
+    .reward-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .coin-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 217, 61, 0.28);
+      border: 2px solid rgba(145, 99, 12, 0.45);
+      color: #5d3d00;
+    }
+
+    .reward-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fef3c7, #fbbf24);
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.7);
+    }
+
+    .combo {
+      position: fixed;
+      left: 20px;
+      top: 104px;
+      z-index: 30;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 217, 61, 0.9);
+      border: 3px solid rgba(125, 86, 19, 0.5);
+      font-size: clamp(0.9rem, 0.8rem + 0.5vw, 1.2rem);
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: #3a2d00;
+      opacity: 0;
+      transition: 0.2s ease;
+      transform: translateY(10px);
+      pointer-events: none;
+      box-shadow: 0 8px 0 rgba(125, 86, 19, 0.38);
+    }
+
+    .combo.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .mission-panel {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      width: min(360px, calc(100vw - 32px));
+      padding: 16px 16px 12px;
+      z-index: 25;
+    }
+
+    .mission-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+
+    .mission-header h3 {
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cyan);
+    }
+
+    .mission-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mission-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.24);
+      border: 2px solid rgba(70, 101, 134, 0.25);
+    }
+
+    .mission-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .mission-title {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .mission-reward {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #fef3c7;
+      font-weight: 800;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.18);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--green), var(--cyan));
+      box-shadow: 0 0 18px rgba(34, 197, 94, 0.4);
+      transition: width 0.25s ease;
+    }
+
+    .mission-item.done {
+      border-color: rgba(28, 134, 92, 0.75);
+      background: rgba(73, 214, 109, 0.18);
+    }
+
+    .mission-item.done .mission-reward {
+      color: #bbf7d0;
+    }
+
+    .slash {
+      position: fixed;
+      width: 140px;
+      height: 22px;
+      border-radius: 999px;
+      pointer-events: none;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255,255,255,0.9) 16%,
+        var(--slice-color, #facc15) 38%,
+        rgba(255,255,255,0.95) 58%,
+        transparent 100%);
+      box-shadow: 0 0 22px var(--slice-color, rgba(250, 204, 21, 0.9));
+      transform: translate(-50%, -50%) rotate(var(--slice-angle, 0deg));
+      opacity: 0;
+      animation: slashAnim 0.3s ease-out forwards;
+      z-index: 999;
+      overflow: visible;
+    }
+
+    .slash::before {
+      content: "";
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      width: 26px;
+      height: 26px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), var(--slice-color, #facc15));
+      border-radius: 0 10px 12px 0;
+      transform: translateY(-50%) rotate(45deg);
+      clip-path: polygon(0 50%, 100% 0, 100% 100%);
+      box-shadow: 0 0 18px var(--slice-color, rgba(250, 204, 21, 0.9));
+    }
+
+    @keyframes slashAnim {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.6) rotate(var(--slice-angle, 0deg));
+      }
+
+      30% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.1) rotate(var(--slice-angle, 0deg));
+      }
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 120px;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 1000;
+      background: rgba(255, 124, 167, 0.96);
+      border: 3px solid rgba(118, 49, 91, 0.5);
+      color: white;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 12px 18px;
+      border-radius: 999px;
+      box-shadow: 0 8px 0 rgba(118, 49, 91, 0.35);
+      opacity: 0;
+      transition: all 0.25s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .gameover {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: rgba(2, 6, 23, 0.84);
+      color: white;
+      z-index: 2000;
+      backdrop-filter: blur(8px);
+    }
+
+    .gameover-box {
+      background: rgba(245, 231, 196, 0.96);
+      border: 4px solid rgba(71, 52, 20, 0.5);
+      border-radius: 24px;
+      padding: 28px 28px 24px;
+      box-shadow: 0 12px 0 rgba(71, 52, 20, 0.32);
+      text-align: center;
+      max-width: 420px;
+      width: min(90vw, 420px);
+    }
+
+    .gameover h1 {
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      margin-bottom: 12px;
+      color: #fca5a5;
+    }
+
+    .gameover p {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .gameover button {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--amber), #ffb547);
+      color: #3d2b00;
+      font-size: 1.05rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 0 rgba(120, 79, 9, 0.35);
+    }
+
+    @media (max-width: 760px) {
+      .ui-layer {
+        padding: 12px;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hud {
+        width: 100%;
+        justify-content: space-between;
+        padding: 12px 14px;
+      }
+
+      .stat {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .side-panel {
+        width: 100%;
+        max-width: none;
+      }
+
+      .combo {
+        left: 50%;
+        top: 132px;
+        transform: translateX(-50%) translateY(10px);
+      }
+
+      .combo.show {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .mission-panel {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        width: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ui-layer">
+    <div class="topbar">
+      <div class="hud">
+        <div class="stat">🍉 <span class="value" id="score">0</span></div>
+        <div class="stat">💣 <span class="value lives" id="lives">3</span></div>
+        <div class="stat">⏱️ <span class="value" id="timer">00:00</span></div>
+      </div>
+
+      <div class="side-panel">
+        <div class="reward-row">
+          <span>Hadiah</span>
+          <div class="coin-box"><span class="reward-badge">🏆</span> <span id="rewardCoins">0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="combo" id="combo">COMBO x2</div>
+
+  <aside class="mission-panel">
+    <div class="mission-header">
+      <h3>Challenge</h3>
+      <span id="challengeStatus" style="color: var(--green-soft); font-weight: 700; font-size: 0.75rem;">Aktif</span>
+    </div>
+    <div class="mission-list" id="missionList"></div>
+  </aside>
+
+  <div class="toast" id="toast">Hadiah naik!</div>
+
+  <div class="gameover" id="gameover">
+    <div class="gameover-box">
+      <h1>GAME OVER</h1>
+      <p>Skor akhir: <strong id="finalScore">0</strong> | Hadiah: <strong id="finalReward">0</strong></p>
+      <button onclick="restartGame()">Main Lagi</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js';
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x020617, 15, 40);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 10;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+    directionalLight.position.set(5, 10, 7);
+    scene.add(directionalLight);
+
+    const fruits = [];
+    const bombs = [];
+    const particles = [];
+    const fruitSlices = [];
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const slashColors = ['#facc15', '#22c55e', '#60a5fa', '#f472b6', '#fb7185', '#f97316', '#e2e8f0'];
+    let lastPointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const textureLoader = new THREE.TextureLoader();
+
+    const state = {
+      score: 0,
+      lives: 3,
+      combo: 0,
+      rewardCoins: 0,
+      fruitsSliced: 0,
+      elapsed: 0,
+      gameRunning: true,
+      timerId: null,
+      spawnDelay: 700,
+      startedAt: Date.now()
+    };
+
+    const scoreEl = document.getElementById('score');
+    const livesEl = document.getElementById('lives');
+    const timerEl = document.getElementById('timer');
+    const rewardCoinsEl = document.getElementById('rewardCoins');
+    const comboEl = document.getElementById('combo');
+    const missionListEl = document.getElementById('missionList');
+    const toastEl = document.getElementById('toast');
+    const gameoverEl = document.getElementById('gameover');
+    const finalScoreEl = document.getElementById('finalScore');
+    const finalRewardEl = document.getElementById('finalReward');
+
+    const challengeData = [
+      { id: 'score200', title: 'Skor 200', goal: 200, reward: 25, progress: 0 },
+      { id: 'combo3', title: 'Combo x3', goal: 3, reward: 30, progress: 0 },
+      { id: 'time30', title: 'Bertahan 30s', goal: 30, reward: 35, progress: 0 },
+      { id: 'slice10', title: 'Potong 10 buah', goal: 10, reward: 40, progress: 0 }
+    ];
+
+    const fruitConfigs = [
+      { key: 'semangka', whole: './assets/buah/semangka.png', slice: './assets/buah/semangka-slice.png', scale: 1.8 },
+      { key: 'jeruk', whole: './assets/buah/jeruk.png', slice: './assets/buah/jeruk-slice.png', scale: 1.5 },
+      { key: 'kiwi', whole: './assets/buah/kiwi.png', slice: './assets/buah/kiwi-slice.png', scale: 1.6 }
+    ];
+
+    function updateScoreUI() {
+      scoreEl.textContent = state.score;
+      livesEl.textContent = state.lives;
+      rewardCoinsEl.textContent = state.rewardCoins;
+    }
+
+    function formatTimer(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add('show');
+      clearTimeout(showToast.timeoutId);
+      showToast.timeoutId = setTimeout(() => {
+        toastEl.classList.remove('show');
+      }, 1400);
+    }
+
+    function renderChallenges() {
+      missionListEl.innerHTML = challengeData.map((item) => {
+        const progress = Math.min(item.progress, item.goal);
+        const width = Math.min((progress / item.goal) * 100, 100);
+        const done = progress >= item.goal;
+
+        return `
+      <div class="mission-item ${done ? 'done' : ''}">
+        <div class="mission-top">
+          <span class="mission-title">${item.title}</span>
+          <span class="mission-reward">+${item.reward} 🏆</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${width}%"></div>
+        </div>
+        <div class="mission-top">
+          <span>${progress}/${item.goal}</span>
+          <span>${done ? 'Selesai' : 'Proses'}</span>
+        </div>
+      </div>
+    `;
+      }).join('');
+    }
+
+    function updateChallenges() {
+      challengeData[0].progress = Math.max(challengeData[0].progress, state.score);
+      challengeData[1].progress = Math.max(challengeData[1].progress, state.combo);
+      challengeData[2].progress = Math.max(challengeData[2].progress, state.elapsed);
+      challengeData[3].progress = Math.max(challengeData[3].progress, state.fruitsSliced);
+
+      const completeCount = challengeData.filter((item) => item.progress >= item.goal).length;
+      document.getElementById('challengeStatus').textContent = completeCount >= 2 ? 'Bonus aktif' : 'Aktif';
+
+      challengeData.forEach((item) => {
+        if (item.progress >= item.goal && !item.claimed) {
+          item.claimed = true;
+          state.rewardCoins += item.reward;
+          showToast(`Challenge selesai! +${item.reward} hadiah`);
+          updateScoreUI();
+        }
+      });
+
+      renderChallenges();
+    }
+
+    function createFruit() {
+      const config = fruitConfigs[Math.floor(Math.random() * fruitConfigs.length)];
+      const wholeTexture = textureLoader.load(config.whole);
+      const material = new THREE.SpriteMaterial({
+        map: wholeTexture,
+        transparent: true,
+        depthWrite: false
+      });
+
+      const fruit = new THREE.Sprite(material);
+      fruit.scale.set(config.scale, config.scale, 1);
+      fruit.position.x = (Math.random() - 0.5) * 12;
+      fruit.position.y = -8;
+      fruit.position.z = (Math.random() - 0.5) * 3;
+      fruit.velocity = {
+        x: (Math.random() - 0.5) * 0.05,
+        y: 0.18 + Math.random() * 0.05
+      };
+      fruit.gravity = 0.003;
+      fruit.type = 'fruit';
+      fruit.fruitName = config.key;
+      fruit.sliceTexture = textureLoader.load(config.slice);
+
+      scene.add(fruit);
+      fruits.push(fruit);
+    }
+
+    function spawnGoldenFruit() {
+      const golden = new THREE.Mesh(
+        new THREE.SphereGeometry(0.82, 32, 32),
+        new THREE.MeshStandardMaterial({
+          color: 0xfacc15,
+          emissive: 0xf59e0b,
+          emissiveIntensity: 0.9,
+          metalness: 0.3,
+          roughness: 0.25
+        })
+      );
+
+      golden.position.x = (Math.random() - 0.5) * 12;
+      golden.position.y = -8;
+      golden.position.z = (Math.random() - 0.5) * 2;
+      golden.velocity = {
+        x: (Math.random() - 0.5) * 0.08,
+        y: 0.2 + Math.random() * 0.08
+      };
+      golden.gravity = 0.0035;
+      golden.type = 'fruit';
+      golden.isGolden = true;
+
+      scene.add(golden);
+      fruits.push(golden);
+    }
+
+    function createBomb() {
+      const geometry = new THREE.SphereGeometry(0.7, 32, 32);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x111111,
+        emissive: 0xff0000,
+        emissiveIntensity: 0.5
+      });
+
+      const bomb = new THREE.Mesh(geometry, material);
+      bomb.position.x = (Math.random() - 0.5) * 12;
+      bomb.position.y = -8;
+      bomb.velocity = {
+        x: (Math.random() - 0.5) * 0.05,
+        y: 0.18 + Math.random() * 0.05
+      };
+      bomb.gravity = 0.003;
+      bomb.type = 'bomb';
+
+      scene.add(bomb);
+      bombs.push(bomb);
+    }
+
+    function createParticles(position, color) {
+      for (let i = 0; i < 15; i++) {
+        const geometry = new THREE.SphereGeometry(0.08, 8, 8);
+        const material = new THREE.MeshBasicMaterial({ color });
+        const particle = new THREE.Mesh(geometry, material);
+
+        particle.position.copy(position);
+        particle.velocity = {
+          x: (Math.random() - 0.5) * 0.2,
+          y: (Math.random() - 0.5) * 0.2,
+          z: (Math.random() - 0.5) * 0.2
+        };
+        particle.life = 1;
+
+        scene.add(particle);
+        particles.push(particle);
+      }
+    }
+
+    function createHalfSliceTexture(imageUrl, side) {
+      const image = new Image();
+      image.src = imageUrl;
+      image.crossOrigin = 'anonymous';
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      return new Promise((resolve) => {
+        image.onload = () => {
+          canvas.width = image.width;
+          canvas.height = image.height;
+
+          const halfWidth = Math.floor(image.width / 2);
+
+          if (side === 'left') {
+            ctx.drawImage(image, 0, 0, halfWidth, image.height, 0, 0, halfWidth, image.height);
+          } else {
+            ctx.drawImage(image, halfWidth, 0, halfWidth, image.height, 0, 0, halfWidth, image.height);
+          }
+
+          const texture = new THREE.CanvasTexture(canvas);
+          texture.needsUpdate = true;
+          resolve(texture);
+        };
+      });
+    }
+
+    async function createFruitSliceEffect(position, fruitName) {
+      const config = fruitConfigs.find((item) => item.key === fruitName) || fruitConfigs[0];
+      const leftTexture = await createHalfSliceTexture(config.slice, 'left');
+      const rightTexture = await createHalfSliceTexture(config.slice, 'right');
+
+      const leftMat = new THREE.SpriteMaterial({ map: leftTexture, transparent: true, depthWrite: false });
+      const rightMat = new THREE.SpriteMaterial({ map: rightTexture, transparent: true, depthWrite: false });
+
+      const left = new THREE.Sprite(leftMat);
+      const right = new THREE.Sprite(rightMat);
+
+      const scale = config.scale;
+      left.scale.set(scale, scale, 1);
+      right.scale.set(scale, scale, 1);
+
+      left.position.copy(position);
+      right.position.copy(position);
+      left.position.x -= 0.5;
+      right.position.x += 0.5;
+      left.position.y += 0.15;
+      right.position.y += 0.15;
+      left.rotation.set(0, 0, -0.4);
+      right.rotation.set(0, 0, 0.4);
+
+      left.velocity = { x: -0.12, y: 0.14 };
+      right.velocity = { x: 0.12, y: 0.14 };
+      left.gravity = 0.0025;
+      right.gravity = 0.0025;
+      left.life = 1;
+      right.life = 1;
+
+      scene.add(left);
+      scene.add(right);
+      fruitSlices.push(left, right);
+    }
+
+    function showSlash(x, y, color) {
+      const slash = document.createElement('div');
+      const angle = Math.atan2(y - lastPointer.y, x - lastPointer.x) * 180 / Math.PI;
+      const chosenColor = color || slashColors[Math.floor(Math.random() * slashColors.length)];
+
+      slash.className = 'slash';
+      slash.style.left = x + 'px';
+      slash.style.top = y + 'px';
+      slash.style.setProperty('--slice-color', chosenColor);
+      slash.style.setProperty('--slice-angle', `${angle}deg`);
+      document.body.appendChild(slash);
+
+      lastPointer = { x, y };
+      setTimeout(() => slash.remove(), 300);
+    }
+
+    function updateCombo() {
+      if (state.combo >= 2) {
+        comboEl.textContent = `COMBO x${state.combo}`;
+        comboEl.classList.add('show');
+        clearTimeout(updateCombo.timeoutId);
+        updateCombo.timeoutId = setTimeout(() => comboEl.classList.remove('show'), 500);
+      } else {
+        comboEl.classList.remove('show');
+      }
+    }
+
+    function finishGame() {
+      state.gameRunning = false;
+      finalScoreEl.textContent = state.score;
+      finalRewardEl.textContent = state.rewardCoins;
+      gameoverEl.style.display = 'flex';
+    }
+
+    window.restartGame = function () {
+      window.location.reload();
+    };
+
+    function sliceAtPosition(x, y) {
+      if (!state.gameRunning) return;
+
+      mouse.x = (x / window.innerWidth) * 2 - 1;
+      mouse.y = -(y / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const objects = [...fruits, ...bombs];
+      const intersects = raycaster.intersectObjects(objects);
+
+      if (!intersects.length) return;
+
+      const object = intersects[0].object;
+      const slashColor = object.type === 'bomb'
+        ? '#ff4d4d'
+        : object.isGolden
+          ? '#facc15'
+          : slashColors[Math.floor(Math.random() * slashColors.length)];
+
+      showSlash(x, y, slashColor);
+
+      if (object.type === 'fruit') {
+        const value = object.isGolden ? 30 : 10;
+        const reward = object.isGolden ? 15 : 5 + Math.min(state.combo, 5);
+
+        state.score += value;
+        state.combo += 1;
+        state.fruitsSliced += 1;
+        state.rewardCoins += reward;
+
+        scoreEl.textContent = state.score;
+        rewardCoinsEl.textContent = state.rewardCoins;
+        updateCombo();
+        updateChallenges();
+        createParticles(object.position, object.isGolden ? 0xfacc15 : 0x00ff88);
+        createFruitSliceEffect(object.position, object.fruitName);
+
+        scene.remove(object);
+        const index = fruits.indexOf(object);
+        if (index >= 0) fruits.splice(index, 1);
+
+        if (object.isGolden) {
+          showToast('Bonus emas! +15 hadiah');
+        }
+      }
+
+      if (object.type === 'bomb') {
+        state.lives -= 1;
+        state.combo = 0;
+        state.rewardCoins = Math.max(0, state.rewardCoins - 5);
+        livesEl.textContent = state.lives;
+        rewardCoinsEl.textContent = state.rewardCoins;
+        createParticles(object.position, 0xff0000);
+        scene.remove(object);
+        const index = bombs.indexOf(object);
+        if (index >= 0) bombs.splice(index, 1);
+        updateCombo();
+
+        if (state.lives <= 0) {
+          finishGame();
+        }
+      }
+    }
+
+    window.addEventListener('pointermove', (event) => {
+      if (!state.gameRunning) return;
+      sliceAtPosition(event.clientX, event.clientY);
+    });
+
+    window.addEventListener('pointerdown', (event) => {
+      if (!state.gameRunning) return;
+      sliceAtPosition(event.clientX, event.clientY);
+    });
+
+    function spawnLoop() {
+      if (!state.gameRunning) return;
+
+      createFruit();
+
+      if (Math.random() < 0.22) {
+        createBomb();
+      }
+
+      if (Math.random() < 0.15 && state.score > 100) {
+        spawnGoldenFruit();
+      }
+
+      state.spawnDelay = Math.max(380, 700 - Math.floor(state.score / 30));
+      setTimeout(spawnLoop, state.spawnDelay);
+    }
+
+    function startTimer() {
+      state.timerId = setInterval(() => {
+        if (!state.gameRunning) return;
+        state.elapsed += 1;
+        timerEl.textContent = formatTimer(state.elapsed);
+        updateChallenges();
+      }, 1000);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      fruits.forEach((fruit, index) => {
+        fruit.position.x += fruit.velocity.x;
+        fruit.position.y += fruit.velocity.y;
+        fruit.velocity.y -= fruit.gravity;
+        fruit.rotation.x += 0.03;
+        fruit.rotation.y += 0.03;
+
+        if (fruit.position.y < -10) {
+          scene.remove(fruit);
+          fruits.splice(index, 1);
+
+          if (state.gameRunning) {
+            state.lives -= 1;
+            state.combo = 0;
+            livesEl.textContent = state.lives;
+            updateCombo();
+
+            if (state.lives <= 0) {
+              finishGame();
+            }
+          }
+        }
+      });
+
+      bombs.forEach((bomb, index) => {
+        bomb.position.x += bomb.velocity.x;
+        bomb.position.y += bomb.velocity.y;
+        bomb.velocity.y -= bomb.gravity;
+        bomb.rotation.x += 0.05;
+        bomb.rotation.y += 0.05;
+
+        if (bomb.position.y < -10) {
+          scene.remove(bomb);
+          bombs.splice(index, 1);
+        }
+      });
+
+      particles.forEach((particle, index) => {
+        particle.position.x += particle.velocity.x;
+        particle.position.y += particle.velocity.y;
+        particle.position.z += particle.velocity.z;
+        particle.life -= 0.02;
+        particle.material.opacity = particle.life;
+        particle.material.transparent = true;
+
+        if (particle.life <= 0) {
+          scene.remove(particle);
+          particles.splice(index, 1);
+        }
+      });
+
+      fruitSlices.forEach((slice, index) => {
+        slice.position.x += slice.velocity.x;
+        slice.position.y += slice.velocity.y;
+        slice.velocity.y -= slice.gravity;
+        slice.rotation.z += 0.03;
+        slice.material.opacity = Math.max(slice.life, 0);
+
+        slice.life -= 0.015;
+
+        if (slice.life <= 0 || slice.position.y < -10) {
+          scene.remove(slice);
+          fruitSlices.splice(index, 1);
+        }
+      });
+
+      renderer.render(scene, camera);
+    }
+
+    updateScoreUI();
+    updateChallenges();
+    startTimer();
+    spawnLoop();
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+
+</html>

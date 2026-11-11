@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080a16">
+  <meta name="description" content="Click Rush, game uji kecepatan klik selama lima detik.">
+  <title>Click Rush — Uji Kecepatan Klikmu</title>
+  <style>
+    :root {
+      --bg: #080a16;
+      --surface: rgba(20, 24, 48, .74);
+      --soft: rgba(255, 255, 255, .055);
+      --line: rgba(255, 255, 255, .1);
+      --text: #f7f7ff;
+      --muted: #9da4bd;
+      --purple: #a775ff;
+      --pink: #ff64b5;
+      --cyan: #42e8e0;
+      --green: #66f0a8
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      color-scheme: dark
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--text);
+      background: radial-gradient(circle at 14% 18%, rgba(111, 75, 255, .2), transparent 30rem), radial-gradient(circle at 88% 76%, rgba(0, 229, 214, .13), transparent 28rem), var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent
+    }
+
+    button {
+      font: inherit
+    }
+
+    .ambient {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none
+    }
+
+    .ambient:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .16;
+      background-image: linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(to bottom, #000, transparent 85%)
+    }
+
+    .orb {
+      position: absolute;
+      width: clamp(240px, 32vw, 520px);
+      aspect-ratio: 1;
+      border-radius: 42% 58% 65% 35%/40% 42% 58% 60%;
+      filter: blur(2px);
+      opacity: .22;
+      animation: drift 14s ease-in-out infinite alternate
+    }
+
+    .orb.one {
+      top: -15%;
+      left: -9%;
+      background: linear-gradient(135deg, var(--purple), var(--pink))
+    }
+
+    .orb.two {
+      right: -12%;
+      bottom: -25%;
+      background: linear-gradient(135deg, var(--cyan), #2d60ff);
+      animation-delay: -6s
+    }
+
+    @keyframes drift {
+      to {
+        transform: translate3d(35px, 25px, 0) rotate(16deg) scale(1.08);
+        border-radius: 63% 37% 41% 59%/48% 60% 40% 52%
+      }
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      min-height: 100vh;
+      margin: auto;
+      padding: 28px 0 34px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 28px
+    }
+
+    .topbar,
+    .brand,
+    .top-actions,
+    .eyebrow,
+    .status-pill,
+    .button-row,
+    .shortcut {
+      display: flex;
+      align-items: center
+    }
+
+    .topbar {
+      justify-content: space-between;
+      gap: 20px
+    }
+
+    .brand {
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -.02em
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, .17);
+      border-radius: 15px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, .13), rgba(255, 255, 255, .03));
+      box-shadow: inset 0 1px rgba(255, 255, 255, .2), 0 12px 30px rgba(0, 0, 0, .2)
+    }
+
+    .brand-mark svg {
+      width: 22px;
+      color: var(--cyan)
+    }
+
+    .top-actions {
+      gap: 10px
+    }
+
+    .nav-link {
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .82rem;
+      font-weight: 700;
+      transition: .2s
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, .24);
+      background: var(--soft)
+    }
+
+    .game-shell {
+      align-self: center;
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(290px, .75fr);
+      gap: 22px
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      background: var(--surface);
+      box-shadow: 0 28px 90px rgba(0, 0, 0, .35), inset 0 1px rgba(255, 255, 255, .07);
+      backdrop-filter: blur(22px)
+    }
+
+    .play-panel {
+      position: relative;
+      min-height: 600px;
+      padding: clamp(24px, 4vw, 46px);
+      overflow: hidden;
+      isolation: isolate
+    }
+
+    .play-panel:after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      width: 330px;
+      height: 330px;
+      top: 52%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: rgba(156, 109, 255, .16);
+      filter: blur(72px)
+    }
+
+    .eyebrow {
+      gap: 8px;
+      margin: 0 0 13px;
+      color: var(--cyan);
+      font-size: .74rem;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase
+    }
+
+    .eyebrow:before {
+      content: "";
+      width: 21px;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor
+    }
+
+    h1 {
+      max-width: 630px;
+      margin: 0;
+      font-size: clamp(2.3rem, 5vw, 4.8rem);
+      line-height: .98;
+      letter-spacing: -.065em
+    }
+
+    h1 span {
+      color: transparent;
+      background: linear-gradient(100deg, var(--purple) 8%, var(--pink) 56%, #ffb58a);
+      background-clip: text;
+      -webkit-background-clip: text
+    }
+
+    .lead {
+      max-width: 510px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: clamp(.92rem, 2vw, 1.05rem);
+      line-height: 1.7
+    }
+
+    .click-zone {
+      min-height: 294px;
+      display: grid;
+      place-items: center;
+      position: relative
+    }
+
+    .click-button {
+      position: relative;
+      width: clamp(174px, 24vw, 226px);
+      aspect-ratio: 1;
+      border: 0;
+      border-radius: 50%;
+      color: #fff;
+      cursor: pointer;
+      background: radial-gradient(circle at 32% 25%, rgba(255, 255, 255, .35), transparent 19%), linear-gradient(145deg, #bb83ff 0%, #8e59f8 38%, #f04d9f 100%);
+      box-shadow: 0 18px 0 #5b318e, 0 28px 60px rgba(146, 79, 248, .4), inset 0 2px 1px rgba(255, 255, 255, .55), inset 0 -12px 26px rgba(68, 22, 108, .25);
+      transition: transform .12s, filter .2s, box-shadow .12s, opacity .2s;
+      user-select: none;
+      touch-action: manipulation
+    }
+
+    .click-button:before,
+    .click-button:after {
+      content: "";
+      position: absolute;
+      inset: -16px;
+      z-index: -1;
+      border: 1px solid rgba(185, 126, 255, .22);
+      border-radius: 50%;
+      animation: breathe 2.6s ease-in-out infinite
+    }
+
+    .click-button:after {
+      inset: -34px;
+      opacity: .48;
+      animation-delay: -1.3s
+    }
+
+    @keyframes breathe {
+      50% {
+        transform: scale(1.07);
+        opacity: .28
+      }
+    }
+
+    .click-button:hover:not(:disabled) {
+      filter: saturate(1.16) brightness(1.08);
+      transform: translateY(-4px) rotate(-1deg)
+    }
+
+    .click-button:active:not(:disabled),
+    .click-button.is-hit {
+      transform: translateY(11px) scale(.96);
+      box-shadow: 0 7px 0 #5b318e, 0 18px 32px rgba(146, 79, 248, .32), inset 0 2px 1px rgba(255, 255, 255, .55)
+    }
+
+    .click-button:disabled {
+      cursor: not-allowed;
+      filter: grayscale(.65);
+      opacity: .52
+    }
+
+    .click-button:focus-visible,
+    .control:focus-visible,
+    .nav-link:focus-visible {
+      outline: 3px solid rgba(66, 232, 224, .65);
+      outline-offset: 5px
+    }
+
+    .click-button strong,
+    .click-button small {
+      display: block;
+      pointer-events: none
+    }
+
+    .click-button strong {
+      font-size: clamp(1.45rem, 3vw, 2rem);
+      letter-spacing: -.04em
+    }
+
+    .click-button small {
+      margin-top: 5px;
+      opacity: .7;
+      font-size: .7rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase
+    }
+
+    .float-score {
+      position: absolute;
+      z-index: 5;
+      color: var(--green);
+      font-weight: 900;
+      font-size: 1.2rem;
+      pointer-events: none;
+      animation: score-float .65s ease-out forwards
+    }
+
+    @keyframes score-float {
+      to {
+        transform: translateY(-64px) rotate(7deg) scale(1.15);
+        opacity: 0
+      }
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .06)
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--purple), var(--pink), var(--cyan));
+      transform-origin: left;
+      transition: transform .1s linear;
+      box-shadow: 0 0 18px rgba(167, 117, 255, .45)
+    }
+
+    .side-panel {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px
+    }
+
+    .status-pill {
+      align-self: flex-start;
+      gap: 8px;
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .035);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      box-shadow: 0 0 0 4px rgba(157, 164, 189, .1)
+    }
+
+    .status-pill.playing .status-dot {
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(102, 240, 168, .1), 0 0 14px var(--green)
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px
+    }
+
+    .stat {
+      min-height: 112px;
+      padding: 17px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--soft)
+    }
+
+    .stat.primary {
+      grid-column: 1/-1;
+      min-height: 136px;
+      background: linear-gradient(135deg, rgba(167, 117, 255, .2), rgba(255, 100, 181, .08))
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: .7rem;
+      font-weight: 800;
+      letter-spacing: .11em;
+      text-transform: uppercase
+    }
+
+    .stat-value {
+      font-size: clamp(1.75rem, 4vw, 3.2rem);
+      font-weight: 850;
+      line-height: 1;
+      letter-spacing: -.055em;
+      font-variant-numeric: tabular-nums
+    }
+
+    .stat:not(.primary) .stat-value {
+      font-size: clamp(1.45rem, 3vw, 2rem)
+    }
+
+    .score-value {
+      color: var(--pink)
+    }
+
+    .time-value {
+      color: var(--cyan)
+    }
+
+    .combo-value {
+      color: var(--purple)
+    }
+
+    .button-row {
+      gap: 10px
+    }
+
+    .control {
+      min-height: 48px;
+      padding: 0 18px;
+      display: inline-flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      color: var(--text);
+      background: rgba(255, 255, 255, .05);
+      cursor: pointer;
+      font-size: .84rem;
+      font-weight: 800;
+      transition: .2s
+    }
+
+    .control svg {
+      width: 17px
+    }
+
+    .control.primary {
+      border-color: transparent;
+      color: #15101f;
+      background: linear-gradient(110deg, #c596ff, #ff85bd);
+      box-shadow: 0 12px 28px rgba(194, 109, 255, .2)
+    }
+
+    .control:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08)
+    }
+
+    .tip {
+      padding: 15px 16px;
+      border: 1px dashed rgba(255, 255, 255, .12);
+      border-radius: 17px;
+      color: var(--muted);
+      font-size: .79rem;
+      line-height: 1.55
+    }
+
+    .tip strong {
+      color: var(--text)
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: #767e99;
+      font-size: .75rem
+    }
+
+    .shortcut {
+      gap: 7px
+    }
+
+    kbd {
+      min-width: 26px;
+      padding: 4px 7px;
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      border-radius: 7px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .04);
+      font: inherit;
+      text-align: center
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      padding: 20px;
+      display: grid;
+      place-items: center;
+      visibility: hidden;
+      opacity: 0;
+      background: rgba(4, 5, 14, .68);
+      backdrop-filter: blur(14px);
+      transition: .25s
+    }
+
+    .modal.open {
+      visibility: visible;
+      opacity: 1
+    }
+
+    .modal-card {
+      width: min(420px, 100%);
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: linear-gradient(145deg, rgba(28, 32, 61, .98), rgba(13, 16, 34, .98));
+      box-shadow: 0 30px 100px rgba(0, 0, 0, .5);
+      text-align: center;
+      transform: translateY(16px) scale(.96);
+      transition: .25s
+    }
+
+    .modal.open .modal-card {
+      transform: none
+    }
+
+    .trophy {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 18px;
+      display: grid;
+      place-items: center;
+      border-radius: 21px;
+      color: #1a1123;
+      background: linear-gradient(145deg, #ffd88a, var(--pink));
+      transform: rotate(-4deg)
+    }
+
+    .trophy svg {
+      width: 30px
+    }
+
+    .modal h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      letter-spacing: -.04em
+    }
+
+    .modal-copy {
+      margin: 8px 0 22px;
+      color: var(--muted);
+      line-height: 1.5
+    }
+
+    .final-score {
+      margin-bottom: 24px;
+      font-size: 4.5rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.08em;
+      color: transparent;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+      background-clip: text;
+      -webkit-background-clip: text
+    }
+
+    .modal .button-row {
+      justify-content: center
+    }
+
+    @media(max-width:860px) {
+      .page {
+        padding-top: 20px
+      }
+
+      .game-shell {
+        grid-template-columns: 1fr
+      }
+
+      .play-panel {
+        min-height: auto
+      }
+
+      .click-zone {
+        min-height: 270px
+      }
+
+      .side-panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: start
+      }
+
+      .stats {
+        grid-column: 1/-1;
+        grid-template-columns: 2fr 1fr 1fr
+      }
+
+      .stat.primary {
+        grid-column: auto;
+        min-height: 112px
+      }
+
+      .button-row,
+      .tip {
+        align-self: stretch
+      }
+    }
+
+    @media(max-width:580px) {
+      .page {
+        width: min(100% - 20px, 1180px);
+        gap: 18px
+      }
+
+      .brand>span:last-child,
+      .nav-link:first-child {
+        display: none
+      }
+
+      .panel {
+        border-radius: 25px
+      }
+
+      .play-panel {
+        padding: 25px 20px
+      }
+
+      .lead {
+        line-height: 1.55
+      }
+
+      .click-zone {
+        min-height: 245px
+      }
+
+      .side-panel {
+        padding: 17px;
+        grid-template-columns: 1fr
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .stat.primary {
+        grid-column: 1/-1
+      }
+
+      .footer {
+        justify-content: center
+      }
+
+      .footer>span:first-child {
+        display: none
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+
+      *,
+      *:before,
+      *:after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ambient" aria-hidden="true"><span class="orb one"></span><span class="orb two"></span></div>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m13 2-2 7h6l-7 13 2-9H6l7-11Z" />
+          </svg></span><span>Click Rush</span></div>
+      <nav class="top-actions" aria-label="Navigasi mode permainan"><a class="nav-link" href="./index.html">Reaction
+          Test</a><a class="nav-link" href="#leaderboard">Leaderboard lokal</a></nav>
+    </header>
+    <section class="game-shell" aria-label="Permainan Click Rush">
+      <div class="panel play-panel">
+        <p class="eyebrow">Speed challenge</p>
+        <h1>Seberapa cepat <span>jarimu?</span></h1>
+        <p class="lead">Kamu punya lima detik. Bangun combo, kejar skor tertinggi, dan jangan biarkan ritmemu putus.</p>
+        <div class="click-zone" id="clickZone"><button class="click-button" id="clickBtn" type="button" disabled
+            aria-label="Tombol klik permainan"><strong id="buttonTitle">Siap?</strong><small id="buttonCaption">tekan
+              mulai</small></button></div>
+        <div class="progress-track" aria-label="Sisa waktu">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+      <aside class="panel side-panel" aria-label="Statistik permainan">
+        <div class="status-pill" id="statusPill"><span class="status-dot"></span><span id="statusText">Belum
+            dimulai</span></div>
+        <div class="stats" aria-live="polite">
+          <article class="stat primary"><span class="stat-label">Skor kamu</span><strong class="stat-value score-value"
+              id="score">0</strong></article>
+          <article class="stat"><span class="stat-label">Waktu</span><strong class="stat-value time-value"><span
+                id="time">5.0</span>s</strong></article>
+          <article class="stat"><span class="stat-label">Combo</span><strong class="stat-value combo-value"
+              id="combo">×1</strong></article>
+          <article class="stat"><span class="stat-label">Terbaik</span><strong class="stat-value" id="best">0</strong>
+          </article>
+          <article class="stat"><span class="stat-label">Total klik</span><strong class="stat-value"
+              id="clicks">0</strong></article>
+        </div>
+        <div class="button-row">
+          <button class="control primary" id="startBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"
+              aria-hidden="true">
+              <path d="M8 5v14l11-7L8 5Z" />
+            </svg><span>Mulai game</span></button>
+          <button class="control" id="resetBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+              <path d="M3 3v5h5" />
+            </svg><span>Reset</span></button>
+        </div>
+        <div class="tip"><strong>Tip:</strong> jaga ritme klik untuk menaikkan combo. Kamu juga bisa memakai tombol
+          spasi di desktop.</div>
+      </aside>
+    </section>
+    <footer class="footer"><span>Data skor tersimpan aman di browser ini.</span><span class="shortcut"><kbd>Space</kbd>
+        untuk klik</span></footer>
+  </main>
+  <div class="modal" id="resultModal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <div class="modal-card">
+      <div class="trophy" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z" />
+          <path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4" />
+        </svg></div>
+      <h2 id="resultTitle">Waktu habis!</h2>
+      <p class="modal-copy" id="resultCopy">Skor akhir kamu</p>
+      <div class="final-score" id="finalScore">0</div>
+      <div class="button-row"><button class="control" id="closeModalBtn" type="button">Tutup</button><button
+          class="control primary" id="playAgainBtn" type="button">Main lagi</button></div>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const DURATION = 5000, $ = id => document.getElementById(id), el = { score: $('score'), time: $('time'), combo: $('combo'), best: $('best'), clicks: $('clicks'), clickBtn: $('clickBtn'), clickZone: $('clickZone'), startBtn: $('startBtn'), resetBtn: $('resetBtn'), progress: $('progressBar'), statusPill: $('statusPill'), statusText: $('statusText'), buttonTitle: $('buttonTitle'), buttonCaption: $('buttonCaption'), modal: $('resultModal'), finalScore: $('finalScore'), resultCopy: $('resultCopy'), closeModal: $('closeModalBtn'), playAgain: $('playAgainBtn') };
+      let score = 0, combo = 1, clicks = 0, best = parseInt(localStorage.getItem('bestScore'), 10) || 0, playing = false, startAt = 0, frame;
+      const stats = () => { el.score.textContent = score; el.combo.textContent = `×${combo}`; el.clicks.textContent = clicks; el.best.textContent = best };
+      const status = (text, on = false) => { el.statusText.textContent = text; el.statusPill.classList.toggle('playing', on) };
+      function reset() { cancelAnimationFrame(frame); score = 0; combo = 1; clicks = 0; playing = false; el.time.textContent = '5.0'; el.progress.style.transform = 'scaleX(1)'; el.clickBtn.disabled = true; el.buttonTitle.textContent = 'Siap?'; el.buttonCaption.textContent = 'tekan mulai'; el.startBtn.querySelector('span').textContent = 'Mulai game'; status('Belum dimulai'); stats() }
+      function start() { close(); score = 0; combo = 1; clicks = 0; playing = true; startAt = performance.now(); el.clickBtn.disabled = false; el.buttonTitle.textContent = 'Klik!'; el.buttonCaption.textContent = 'secepat mungkin'; el.startBtn.querySelector('span').textContent = 'Ulangi'; status('Sedang bermain', true); stats(); cancelAnimationFrame(frame); frame = requestAnimationFrame(tick); el.clickBtn.focus({ preventScroll: true }) }
+      function tick(now) { const left = Math.max(0, DURATION - (now - startAt)); el.time.textContent = (left / 1000).toFixed(1); el.progress.style.transform = `scaleX(${left / DURATION})`; if (left <= 0) return finish(); frame = requestAnimationFrame(tick) }
+      function hit(event) { if (!playing) return; const gain = combo; score += gain; clicks++; combo++; stats(); el.clickBtn.classList.remove('is-hit'); void el.clickBtn.offsetWidth; el.clickBtn.classList.add('is-hit'); setTimeout(() => el.clickBtn.classList.remove('is-hit'), 90); particle(event, gain) }
+      function particle(event, gain) { const zone = el.clickZone.getBoundingClientRect(), button = el.clickBtn.getBoundingClientRect(), p = document.createElement('span'); p.className = 'float-score'; p.textContent = `+${gain}`; const x = event?.clientX || button.left + button.width * .72, y = event?.clientY || button.top + button.height * .32; p.style.left = `${x - zone.left}px`; p.style.top = `${y - zone.top}px`; el.clickZone.appendChild(p); p.addEventListener('animationend', () => p.remove(), { once: true }) }
+      function finish() { playing = false; cancelAnimationFrame(frame); el.clickBtn.disabled = true; el.time.textContent = '0.0'; el.buttonTitle.textContent = 'Selesai!'; el.buttonCaption.textContent = `${clicks} klik`; status('Game selesai'); if (score > best) { best = score; localStorage.setItem('bestScore', String(best)); el.resultCopy.textContent = 'Rekor baru! Ritmemu luar biasa.' } else el.resultCopy.textContent = `Kamu membuat ${clicks} klik. Coba kalahkan skor ${best}.`; el.finalScore.textContent = score; stats(); setTimeout(open, 180) }
+      function open() { el.modal.classList.add('open'); el.playAgain.focus() } function close() { el.modal.classList.remove('open') }
+      el.clickBtn.addEventListener('click', hit); el.startBtn.addEventListener('click', start); el.resetBtn.addEventListener('click', () => { close(); reset() }); el.closeModal.addEventListener('click', close); el.playAgain.addEventListener('click', start); el.modal.addEventListener('click', e => { if (e.target === el.modal) close() }); document.addEventListener('keydown', e => { if (e.code === 'Space' && playing && document.activeElement !== el.clickBtn) { e.preventDefault(); hit() } if (e.key === 'Escape' && el.modal.classList.contains('open')) close() }); reset();
+    })();
+  </script>
+</body>
+
+</html>

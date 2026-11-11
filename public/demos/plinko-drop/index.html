@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#070818">
+  <meta name="description" content="Plinko Drop Digital — game arcade physics berbasis browser.">
+  <title>Plinko Drop Digital</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><circle cx=%2232%22 cy=%2232%22 r=%2228%22 fill=%22%23070818%22 stroke=%22%2352e5ff%22 stroke-width=%224%22/><circle cx=%2238%22 cy=%2220%22 r=%2210%22 fill=%22%23ff4eb8%22/></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <main class="app-shell" id="app">
+    <section class="screen welcome-screen is-active" id="welcome-screen" aria-labelledby="game-title">
+      <div class="welcome-copy">
+        <div class="brand-mark" aria-label="Arcadia Labs">
+          <span class="brand-orbit"></span><span>ARCADIA <b>LABS</b></span>
+        </div>
+        <p class="eyebrow">PHYSICS ARCADE EXPERIENCE</p>
+        <h1 id="game-title"><span>PLINKO</span> DROP</h1>
+        <p class="welcome-lead">Pilih posisi. Lepaskan bola. Biarkan gravitasi menentukan ceritanya.</p>
+
+        <div class="setup-card" aria-label="Pengaturan permainan">
+          <fieldset>
+            <legend>TINGKAT KESULITAN</legend>
+            <div class="segmented" id="difficulty-picker">
+              <button type="button" data-value="easy">Easy</button>
+              <button type="button" class="is-selected" data-value="normal">Normal</button>
+              <button type="button" data-value="hard">Hard</button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>MODE HASIL</legend>
+            <div class="segmented mode-picker" id="mode-picker">
+              <button type="button" class="is-selected" data-value="physics">Pure Physics</button>
+              <button type="button" data-value="weighted">Weighted</button>
+            </div>
+            <p id="mode-description">Hasil murni ditentukan oleh slot yang dimasuki bola.</p>
+          </fieldset>
+        </div>
+
+        <div class="welcome-actions">
+          <button class="primary-button" id="start-button" type="button"><span>START GAME</span><i aria-hidden="true">→</i></button>
+          <button class="text-button" id="how-to-button" type="button">HOW TO PLAY</button>
+          <button class="text-button subtle" id="reset-stats-button" type="button">RESET STATS</button>
+        </div>
+      </div>
+
+      <div class="welcome-visual" aria-hidden="true">
+        <div class="mini-board" id="mini-board"></div>
+        <div class="hero-ball"></div>
+        <span class="score-chip chip-a">+250</span>
+        <span class="score-chip chip-b">+50</span>
+      </div>
+    </section>
+
+    <section class="screen game-screen" id="game-screen" aria-label="Permainan Plinko">
+      <header class="game-header">
+        <div class="brand-mark compact"><span class="brand-orbit"></span><span>ARCADIA <b>LABS</b></span></div>
+        <div class="hud">
+          <div class="hud-item"><span>BALLS</span><strong id="balls-value">5</strong></div>
+          <div class="hud-item score"><span>SCORE</span><strong id="score-value">0000</strong></div>
+          <div class="hud-item"><span>BEST</span><strong id="best-value">0000</strong></div>
+        </div>
+        <div class="header-actions">
+          <span class="mode-badge" id="mode-badge">PURE PHYSICS</span>
+          <button class="icon-button" id="sound-button" type="button" aria-label="Matikan suara" aria-pressed="true">◖</button>
+          <button class="icon-button" id="fullscreen-button" type="button" aria-label="Layar penuh">⛶</button>
+        </div>
+      </header>
+
+      <div class="game-content">
+        <div class="board-wrap" id="board-wrap">
+          <canvas id="game-canvas" width="840" height="760" aria-label="Papan Plinko"></canvas>
+          <div class="drop-guide" id="drop-guide"><span>GESER UNTUK MEMILIH POSISI</span></div>
+          <div class="result-float" id="result-float" aria-live="polite"></div>
+        </div>
+
+        <aside class="side-panel">
+          <div>
+            <p class="panel-label">DROP POSITION</p>
+            <div class="position-meter"><span id="position-meter-fill"></span></div>
+            <p class="panel-hint">Gunakan tombol, keyboard ← →, atau geser langsung di papan.</p>
+          </div>
+          <div class="control-pad">
+            <button class="move-button" id="left-button" type="button" aria-label="Geser ke kiri">←</button>
+            <button class="drop-button" id="drop-button" type="button"><span>DROP</span><small>SPACE</small></button>
+            <button class="move-button" id="right-button" type="button" aria-label="Geser ke kanan">→</button>
+          </div>
+          <div class="game-meta">
+            <div><span>DIFFICULTY</span><strong id="difficulty-value">NORMAL</strong></div>
+            <div><span>DROPS</span><strong id="drops-value">0</strong></div>
+          </div>
+          <button class="secondary-button" id="restart-button" type="button">↻ RESTART GAME</button>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="how-to-modal" hidden>
+    <section class="modal instructions-modal" role="dialog" aria-modal="true" aria-labelledby="how-title">
+      <button class="modal-close" data-close-modal type="button" aria-label="Tutup">×</button>
+      <p class="eyebrow">QUICK GUIDE</p>
+      <h2 id="how-title">Cara Bermain</h2>
+      <ol class="steps">
+        <li><b>01</b><span><strong>Atur posisi</strong>Geser launcher di bagian atas papan.</span></li>
+        <li><b>02</b><span><strong>Jatuhkan bola</strong>Tekan DROP dan lihat bola memantul.</span></li>
+        <li><b>03</b><span><strong>Kumpulkan poin</strong>Nilai slot akan ditambahkan ke skor.</span></li>
+      </ol>
+      <div class="fairness-note"><strong>Transparansi hasil</strong><span>Pure Physics mengikuti lintasan bola. Weighted memilih hadiah satu kali sebelum animasi dan tidak mengubahnya setelah drop.</span></div>
+      <button class="primary-button modal-action" data-close-modal type="button"><span>MENGERTI</span><i>✓</i></button>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="game-over-modal" hidden>
+    <section class="modal game-over-modal" role="dialog" aria-modal="true" aria-labelledby="finish-title">
+      <div class="trophy">✦</div>
+      <p class="eyebrow">SESSION COMPLETE</p>
+      <h2 id="finish-title">Game Over</h2>
+      <p class="final-label">FINAL SCORE</p>
+      <strong class="final-score" id="final-score">0</strong>
+      <p class="new-best" id="new-best" hidden>NEW HIGH SCORE!</p>
+      <div class="summary-grid">
+        <div><span>Best drop</span><b id="best-drop">0</b></div>
+        <div><span>Difficulty</span><b id="final-difficulty">Normal</b></div>
+      </div>
+      <div class="modal-buttons">
+        <button class="primary-button" id="play-again-button" type="button"><span>PLAY AGAIN</span><i>↻</i></button>
+        <button class="text-button" id="back-home-button" type="button">BACK TO HOME</button>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

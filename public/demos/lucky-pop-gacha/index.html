@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#160d3c">
+  <meta name="description" content="Lucky Pop, game gacha interaktif untuk activity booth.">
+  <title>Lucky Pop — Booth Gacha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700;800&family=Paytone+One&display=swap" rel="stylesheet">
+  <link rel="preload" href="assets/lucky-pop-mascot.png" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/lucky-machine-body.png" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/lucky-machine-marquee.png" as="image">
+  <link rel="preload" href="assets/lucky-control-console.png" as="image">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Lucky Pop beranda"><span class="brand-mark">LP</span><span>LUCKY <b>POP!</b></span></a>
+    <div class="top-actions">
+      <div class="session-chip"><i></i><span id="sessionCount">0</span> peserta hari ini</div>
+      <button class="icon-button" id="soundBtn" type="button" aria-label="Matikan suara" title="Suara">♪</button>
+      <button class="icon-button" id="fullscreenBtn" type="button" aria-label="Layar penuh" title="Layar penuh">⛶</button>
+      <button class="operator-link" id="operatorBtn" type="button">Operator</button>
+    </div>
+  </header>
+  <main>
+    <section class="hero-copy" aria-labelledby="mainTitle">
+      <div class="hero-words">
+        <p class="eyebrow"><span>✦</span> ACTIVITY BOOTH CHALLENGE <span>✦</span></p>
+        <h1 id="mainTitle">Pilih bola keberuntungan.<br><em>Bawa pulang kejutan!</em></h1>
+        <p>Banyak bola menantimu di dalam mesin. Pilih minimal 5 bola, tarik tuas, dan temukan hadiah spesialmu.</p>
+        <div class="hero-badges" aria-label="Keunggulan permainan">
+          <span>⚡ Main cepat</span><span>✦ Hadiah langsung</span>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="hero-glow"></div>
+        <img class="hero-machine" src="assets/lucky-machine-body.png" alt="" width="934" height="1400" fetchpriority="high">
+        <img class="hero-mascot" src="assets/lucky-pop-mascot.png" alt="" width="1248" height="1248">
+        <span class="art-sticker">100%<small>SERU!</small></span>
+      </div>
+    </section>
+    <section class="game-shell" id="gameShell">
+      <aside class="how-to" aria-label="Cara bermain">
+        <div class="section-label">CARA BERMAIN</div>
+        <ol class="steps">
+          <li class="active" data-step="1"><span>01</span><div><b>Masukkan nama</b><small>Nama panggilan saja</small></div></li>
+          <li data-step="2"><span>02</span><div><b>Pilih bola</b><small>Minimal 5 bola</small></div></li>
+          <li data-step="3"><span>03</span><div><b>Tarik tuas</b><small>Lihat kejutanmu</small></div></li>
+        </ol>
+        <div class="booth-note"><span>⚡</span><p><b>1x kesempatan</b><br>untuk setiap peserta</p></div>
+      </aside>
+      <div class="machine-card">
+        <div class="machine-top" aria-hidden="true"><img src="assets/lucky-machine-marquee.png" alt="" width="2172" height="724"></div>
+        <div class="screen" id="machineScreen">
+          <div class="idle-state" id="idleState">
+            <span class="spark spark-one">✦</span><span class="spark spark-two">✦</span>
+            <div class="capsule-preview" aria-hidden="true"><span>?</span></div>
+            <p>MESIN SIAP!</p><h2>Siapa yang beruntung?</h2><p class="screen-help">Masukkan nama untuk memulai permainan</p>
+          </div>
+          <div class="capsule-stage" id="capsuleStage" hidden><p class="stage-title">PILIH MINIMAL 5 BOLA</p><p class="selection-hint" id="selectionHint" aria-live="polite">0 dari minimal 5 bola dipilih</p><div class="capsule-grid" id="capsuleGrid" role="group" aria-label="Bola keberuntungan di dalam mesin"></div></div>
+          <div class="draw-stage" id="drawStage" hidden><div class="draw-capsule" id="drawCapsule"><span>?</span></div><p id="drawMessage">Mesin sedang mengacak hadiah...</p></div>
+          <div class="result-stage" id="resultStage" hidden aria-live="polite">
+            <div class="result-rays" aria-hidden="true"></div><div class="prize-icon" id="prizeIcon">🎁</div><p class="result-label">KAMU MENDAPATKAN</p><h2 id="prizeName">Hadiah Misteri</h2><p id="prizeMessage">Tunjukkan layar ini kepada penjaga booth.</p><div class="claim-code" id="claimCode">KODE: LP-0000</div>
+          </div>
+        </div>
+        <div class="controls">
+          <form id="playerForm" novalidate><label for="playerName">NAMA PANGGILAN</label><div class="input-row"><input id="playerName" name="playerName" type="text" maxlength="24" autocomplete="off" placeholder="Ketik nama kamu..." aria-describedby="nameError"><button class="primary-button" id="startBtn" type="submit">MULAI <span>→</span></button></div><p class="field-error" id="nameError" role="alert"></p></form>
+          <div class="lever-controls" id="leverControls" hidden><div class="selected-info"><small>PILIHANMU</small><b id="selectedLabel">0 bola dipilih</b></div><button class="lever-button" id="drawBtn" type="button" disabled><span class="lever-dot"></span><span>TARIK TUAS</span><small>PILIH MINIMAL 5 BOLA</small></button></div>
+          <div class="result-controls" id="resultControls" hidden><div><small>PEMENANG</small><b id="winnerName">—</b></div><button class="next-button" id="nextBtn" type="button">PESERTA BERIKUTNYA <span>→</span></button></div>
+        </div>
+      </div>
+      <aside class="prize-board" aria-label="Daftar hadiah"><div class="section-label">HADIAH HARI INI</div><div id="publicPrizeList" class="public-prizes"></div><p class="stock-note">* Selama persediaan masih ada</p></aside>
+    </section>
+    <section class="trust-strip" aria-label="Informasi permainan"><div><span>⚡</span><p><b>CEPAT</b><small>± 30 detik per pemain</small></p></div><div><span>✓</span><p><b>ADIL & ACAK</b><small>Peluang transparan</small></p></div><div><span>🎁</span><p><b>HADIAH LANGSUNG</b><small>Klaim di booth</small></p></div></section>
+  </main>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+  <dialog id="operatorDialog" class="operator-dialog">
+    <form method="dialog" class="dialog-head"><div><p>BOOTH CONTROL</p><h2>Panel Operator</h2></div><button class="close-button" aria-label="Tutup panel">×</button></form>
+    <div class="dialog-body">
+      <div class="stats-grid"><div><small>TOTAL PESERTA</small><b id="statPlayers">0</b></div><div><small>HADIAH KELUAR</small><b id="statWins">0</b></div><div><small>SISA STOK</small><b id="statStock">0</b></div></div>
+      <section><div class="operator-section-head"><div><p>PRIZE POOL</p><small>Atur bobot peluang dan stok hadiah.</small></div></div><div class="prize-editor" id="prizeEditor"></div><p class="operator-hint">Bobot digunakan secara relatif. Hadiah dengan stok 0 otomatis tidak ikut undian.</p></section>
+      <section><div class="operator-section-head"><div><p>RIWAYAT SESI</p><small>Data hanya tersimpan di browser perangkat ini.</small></div><button id="exportBtn" class="text-button" type="button">Ekspor CSV</button></div><div class="history-table-wrap"><table><thead><tr><th>Waktu</th><th>Peserta</th><th>Hadiah</th><th>Kode</th></tr></thead><tbody id="historyBody"></tbody></table></div></section>
+      <div class="danger-row"><button id="resetSessionBtn" class="danger-button" type="button">Reset sesi hari ini</button><button id="saveSettingsBtn" class="save-button" type="button">Simpan pengaturan</button></div>
+    </div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <footer><span>LUCKY POP!</span><small>Booth Edition · Made for happy moments</small></footer>
+  <script src="app.js"></script>
+</body>
+</html>

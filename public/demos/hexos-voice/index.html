@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mic Volume Level</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      color: #002a0b;
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 50px;
+      background: url('./bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    #volumeText {
+      font-size: 100px;
+      display: none;
+    }
+    #bar {
+      margin: 40px auto;
+      height: 40px;
+      background-color: gray;
+      width: 60%;
+      position: relative;
+      display: none;
+    }
+    #level {
+      height: 100%;
+      background-color: #002a0b;
+      width: 0%;
+    }
+    #inputSection {
+      margin-bottom: 30px;
+    }
+    #countdown {
+      font-size: 40px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+    #image-logo {
+      display: none;
+      justify-content: center;
+      position: relative;
+      width: fit-content;
+      margin: auto;
+    }
+
+#image-logo img {
+  filter: grayscale(100%);
+  transition: filter 0.5s ease;
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#color-overlay {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+  background: url('./HEXOS-PACK.png') no-repeat center;
+  background-size: cover;
+  pointer-events: none;
+  mix-blend-mode: normal;
+  transition: height 0.1s ease-out;
+}
+
+  .custom-backdrop {
+    z-index: 9999; /* Set a high z-index value */
+  }
+
+  .bg-confetti {
+    position: absolute;
+    top: 50px;
+    left: 358px;
+  }
+
+  #count-big {
+    font-size: 400px;
+  }
+  </style>
+</head>
+<body>
+ 
+  <div class="mx-auto container">
+    <div id="inputSection" class="mx-auto w-[500px] bg-yellow-300 rounded-xl shadow-xl">
+      <div class="max-w-sm mx-auto">
+        <div class="py-5">
+          <h1 class="block mb-2 text-gray-900 text-3xl font-bold">TULIS NAMA KAMU</h1>
+          <input type="text" id="nameInput" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-4" placeholder="Masukkan nama" required />
+        </div>
+        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center mb-5" onclick="startInitialCountdown()">Submit</button>
+      </div>
+    </div>
+
+    <div id="countdown" class="text-4xl font-bold"></div>
+
+    <span id="count-big"></span>
+
+    <div id="image-logo" class="mx-auto relative bg-white" style="height: 600px;">
+      <img src="./HEXOS-PACK.png" alt="Logo" />
+      <div id="color-overlay"></div>
+    </div>
+
+    <div id="volumeText">0%</div>
+    <div id="bar"><div id="level"></div></div>
+
+    <!-- <div class="bg-confetti none">
+      <img src="/confetti.gif"/>
+    </div> -->
+  </div>
+
+  <script>
+    let micStream = null;
+    let getVolumeFrame = null;
+    let countdownInterval = null;
+
+    // peakVolume Ini dihitung berdasarkan nilai volume tertinggi yang pernah tercatat selama sesi.
+    let peakVolume = 0;
+
+    let alertShown = false;
+
+    function startInitialCountdown() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (!name) {
+        alert("Silakan masukkan nama terlebih dahulu.");
+        return;
+      }
+
+      document.getElementById('inputSection').style.display = 'none';
+
+      let counter = 3;
+      const countdown = document.getElementById('countdown');
+      const countdownBig = document.getElementById('count-big');
+      countdown.textContent = `Mulai dalam`;
+      countdownBig.textContent = `${counter}`;
+
+      countdownInterval = setInterval(() => {
+        counter--;
+        if (counter > 0) {
+          countdown.textContent = `Mulai dalam`;
+          countdownBig.textContent = `${counter}`;
+        } else {
+          clearInterval(countdownInterval);
+          countdown.textContent = '';
+          countdownBig.textContent = '';
+          document.getElementById('volumeText').style.display = 'block';
+          document.getElementById('bar').style.display = 'block';
+          document.getElementById('image-logo').style.display = 'flex';
+          startMic();
+        }
+      }, 1000);
+    }
+
+    async function startMic() {
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioContext.createMediaStreamSource(micStream);
+        const analyser = audioContext.createAnalyser();
+
+        analyser.fftSize = 2048;
+        const dataArray = new Uint8Array(analyser.fftSize);
+        source.connect(analyser);
+
+        const overlay = document.getElementById('color-overlay');
+        const volumeText = document.getElementById('volumeText');
+        const level = document.getElementById('level');
+
+        let lastVolume = 0;
+        const smoothingFactor = 0.1;
+
+        //maxVolume nilai batas maksimum untuk volume yang dapat dicapai
+        const maxVolume = 100;
+        let isRunning = true;
+
+        function getVolume() {
+          if (!isRunning) return;
+
+          analyser.getByteTimeDomainData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            const deviation = dataArray[i] - 128;
+            sum += deviation * deviation;
+          }
+
+          // rawVolume untuk menghitung dan membatasi nilai volume yang terdeteksi dari mikrofon
+          const rms = Math.sqrt(sum / dataArray.length);
+          let rawVolume = Math.min(maxVolume, Math.floor(rms * 0.5));
+
+          let smoothedVolume = lastVolume + (rawVolume - lastVolume) * smoothingFactor;
+          smoothedVolume = Math.min(maxVolume, Math.max(0, smoothedVolume));
+
+          if (smoothedVolume > peakVolume) {
+            peakVolume = smoothedVolume;
+          }
+
+          volumeText.textContent = `${Math.floor(peakVolume)}%`;
+          level.style.width = `${peakVolume}%`;
+
+          const overlayHeight = (peakVolume / maxVolume) * 100;
+          overlay.style.height = `${overlayHeight}%`;
+
+          if (!alertShown && smoothedVolume >= 99) {
+            volumeText.textContent = '100%';
+            level.style.width = `${maxVolume}%`;
+            alertShown = true;
+            document.getElementById('color-overlay').style.mixBlendMode = 'normal';
+            clearInterval(countdownInterval);
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil!',
+              text: 'Volume maksimal tercapai!',
+              confirmButtonText: 'OK',
+               }).then((result) => {
+                if (result.isConfirmed) {
+                  location.reload(); // reload halaman ketika tombol OK diklik
+                }
+                  stopMic();
+              });
+            return;
+          }
+
+          lastVolume = smoothedVolume;
+          getVolumeFrame = requestAnimationFrame(getVolume);
+        }
+
+        getVolume();
+        start20SecondCountdown(() => {
+          stopMic();
+          Swal.fire({
+            icon: 'error',
+            title: 'Waktu habis!',
+            text: 'Gagal Mendapatkan !',
+            confirmButtonText: 'OK'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              location.reload(); // reload halaman ketika tombol OK diklik
+            }
+          });
+        });
+
+        function stopMic() {
+          isRunning = false;
+          if (micStream) micStream.getTracks().forEach(track => track.stop());
+          cancelAnimationFrame(getVolumeFrame);
+        }
+
+      } catch (err) {
+        alert('Mic access denied or error: ' + err.message);
+      }
+    }
+
+    function start20SecondCountdown(onFinish) {
+      const countdownElement = document.getElementById('countdown');
+      const totalTime = 20000;
+      const startTime = Date.now();
+
+      countdownInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const remaining = totalTime - elapsed;
+
+        if (remaining <= 0) {
+          clearInterval(countdownInterval);
+          countdownElement.textContent = `Waktu tersisa: 00 : 00 : 00`;
+          if (typeof onFinish === 'function') onFinish();
+        } else {
+          const seconds = Math.floor(remaining / 1000);
+          const tenths = Math.floor((remaining % 1000) / 100);
+          countdownElement.textContent = `Waktu tersisa: 00 : ${String(seconds).padStart(2, '0')} : 0${tenths}`;
+        }
+      }, 100);
+    }
+  </script>
+  
+</body>
+</html>

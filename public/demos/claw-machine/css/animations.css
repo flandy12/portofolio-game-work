@@ -1,0 +1,18 @@
+@keyframes floatClaw { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(3px); } }
+@keyframes prizeBob { 0%,100% { margin-top: 0; } 50% { margin-top: -5px; } }
+@keyframes pulseGlow { 0%,100% { opacity: .45; } 50% { opacity: .8; } }
+@keyframes cabinetIn { from { opacity: 0; transform: translateY(24px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+@keyframes fallToChute { to { transform: translate(-50%, 170%) rotate(35deg) scale(.65); opacity: 0; } }
+
+.game-screen:not([hidden]) .cabinet-wrap { animation: cabinetIn .45s cubic-bezier(.2,.8,.2,1); }
+.claw-assembly.idle { animation: floatClaw 1.8s ease-in-out infinite; }
+.prize { animation: prizeBob 2.2s ease-in-out infinite; animation-delay: var(--delay); }
+.machine-glow { animation: pulseGlow 3s ease-in-out infinite; }
+.machine.shake { animation: shake .25s linear; }
+.prize.falling { animation: fallToChute .55s cubic-bezier(.3,.1,.8,.4) forwards; }
+.status-card.danger strong { color: #ff6b8e; animation: pulseGlow .65s infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

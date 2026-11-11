@@ -1,0 +1,918 @@
+:root {
+    --design-width: 900;
+    --design-height: 1600;
+    --uniquip-yellow: #f7b500;
+    --charcoal: #161a1d;
+    --industrial-gray: #343a40;
+    --white: #ffffff;
+    --sand: #d8c3a5;
+    --panel: rgba(255, 255, 255, 0.14);
+    --panel-strong: rgba(255, 255, 255, 0.2);
+    --border: rgba(255, 255, 255, 0.24);
+    --shadow: 0 24px 60px rgba(9, 14, 18, 0.28);
+    --success: #f7b500;
+    --fail: #c85a46;
+    --perfect: #ffd256;
+    --great: #fff2c7;
+    --good: #d8c3a5;
+    --hit: #f5f5f5;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    font-family: "Segoe UI Variable", "Segoe UI", "Trebuchet MS", sans-serif;
+    color: var(--white);
+    background: url("assets/bg-master.png") center/cover no-repeat;
+    overflow: hidden;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    /* background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.03) 34%, rgba(22, 26, 29, 0.24)),
+        repeating-linear-gradient(
+            130deg,
+            rgba(255, 255, 255, 0.02) 0 12px,
+            rgba(0, 0, 0, 0.02) 12px 24px
+        ); */
+    pointer-events: none;
+}
+
+.app-shell {
+    position: relative;
+    height: 100dvh;
+    min-height: 0;
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.topbar {
+    width: min(1080px, 100%);
+    flex: 0 0 auto;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.brand-block {
+    display: grid;
+    gap: 8px;
+}
+
+.brand-mark {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(22, 26, 29, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: var(--uniquip-yellow);
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+}
+
+.brand-block h1 {
+    margin: 0;
+    max-width: 520px;
+    color: #101417;
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: clamp(1.7rem, 3vw, 2.7rem);
+    line-height: 0.95;
+    letter-spacing: 0.08em;
+    text-shadow: 0 6px 18px rgba(255, 255, 255, 0.24);
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.utility-button,
+.secondary-button,
+.modal-action,
+.modal-close {
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(22, 26, 29, 0.68);
+    color: var(--white);
+    cursor: pointer;
+    transition:
+        transform 180ms ease,
+        background 180ms ease,
+        border-color 180ms ease,
+        opacity 180ms ease;
+}
+
+.utility-button {
+    min-height: 46px;
+    padding: 0 16px;
+    border-radius: 16px;
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.difficulty-control {
+    position: relative;
+    display: grid;
+    gap: 3px;
+}
+
+.difficulty-control > span {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.difficulty-input {
+    width: 116px;
+    appearance: textfield;
+    cursor: text;
+    text-align: center;
+}
+
+.difficulty-input::-webkit-inner-spin-button,
+.difficulty-input::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+.utility-button:hover,
+.secondary-button:hover,
+.modal-action:hover,
+.modal-close:hover,
+.primary-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.game-layout {
+    display: flex;
+    justify-content: center;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.game-frame {
+    /* The stage is designed on a 900 x 1600 portrait artboard. */
+    position: relative;
+    width: min(100%, 900px);
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    min-height: 0;
+}
+
+.hud {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.hud-card {
+    display: grid;
+    gap: 6px;
+    padding: 14px 14px 12px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+    border: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 12px 30px rgba(10, 12, 14, 0.18);
+}
+
+.hud-label {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+}
+
+.hud-value {
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    letter-spacing: 0.06em;
+}
+
+.game-stage {
+    position: relative;
+    overflow: hidden;
+    width: auto;
+    aspect-ratio: 9 / 16;
+    height: 100%;
+    max-height: 100%;
+    justify-self: center;
+    min-height: 0;
+    max-width: none;
+    border-radius: 32px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05));
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    box-shadow: var(--shadow);
+    isolation: isolate;
+}
+
+.stage-scene,
+.stage-overlay,
+.landing-screen,
+.countdown-overlay,
+.result-badge,
+.particles-layer,
+.falling-product,
+.target-zone {
+    position: absolute;
+}
+
+.stage-scene,
+.stage-overlay,
+.landing-screen,
+.countdown-overlay,
+.particles-layer {
+    inset: 0;
+}
+
+.stage-scene {
+    background: url('assets/bg-quarry-clean.png') center / 100% 100% no-repeat;
+}
+
+/* The supplied art already contains the quarry, machines, and target area. */
+.stage-scene > div {
+    display: none;
+}
+
+.stage-overlay {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.02) 40%, rgba(22, 26, 29, 0.22)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02), transparent 16%, transparent 84%, rgba(255, 255, 255, 0.02));
+    z-index: 1;
+}
+
+.scene-sky {
+    position: absolute;
+    inset: 0 0 38% 0;
+    background:
+        radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.88), transparent 9%),
+        radial-gradient(circle at 72% 18%, rgba(255, 255, 255, 0.7), transparent 10%),
+        linear-gradient(180deg, #dff2ff 0%, #d6e8f0 52%, #bcced3 100%);
+}
+
+.scene-mountains {
+    position: absolute;
+    left: -8%;
+    right: -8%;
+    border-radius: 48% 52% 0 0;
+}
+
+.scene-mountains-back {
+    bottom: 34%;
+    height: 24%;
+    background:
+        linear-gradient(180deg, rgba(87, 95, 98, 0.62), rgba(62, 67, 69, 0.96)),
+        radial-gradient(circle at 28% 30%, rgba(255, 255, 255, 0.18), transparent 24%);
+    clip-path: polygon(0 100%, 10% 55%, 18% 62%, 29% 36%, 41% 61%, 56% 28%, 67% 54%, 80% 34%, 100% 100%);
+}
+
+.scene-mountains-front {
+    bottom: 22%;
+    height: 30%;
+    background:
+        linear-gradient(180deg, rgba(125, 114, 95, 0.76), rgba(87, 76, 62, 0.94)),
+        radial-gradient(circle at 60% 18%, rgba(255, 255, 255, 0.16), transparent 22%);
+    clip-path: polygon(0 100%, 8% 44%, 20% 64%, 34% 22%, 49% 62%, 62% 34%, 75% 54%, 92% 28%, 100% 100%);
+}
+
+.scene-road {
+    position: absolute;
+    left: -6%;
+    right: -6%;
+    bottom: -2%;
+    height: 42%;
+    background:
+        linear-gradient(180deg, rgba(117, 98, 74, 0.14), rgba(94, 76, 57, 0.54)),
+        linear-gradient(180deg, rgba(120, 97, 64, 0), rgba(51, 44, 38, 0.72) 82%);
+    clip-path: polygon(0 42%, 19% 23%, 46% 15%, 100% 36%, 100% 100%, 0 100%);
+}
+
+.scene-lane {
+    position: absolute;
+    left: 50%;
+    bottom: 20%;
+    width: 32%;
+    height: 50%;
+    transform: translateX(-50%);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04)),
+        linear-gradient(180deg, rgba(247, 181, 0, 0.08), rgba(247, 181, 0, 0));
+    clip-path: polygon(42% 0, 58% 0, 80% 100%, 20% 100%);
+    opacity: 0.55;
+}
+
+.scene-machine {
+    position: absolute;
+    bottom: 9%;
+    width: 24%;
+    height: 16%;
+    background: linear-gradient(180deg, rgba(22, 26, 29, 0.9), rgba(22, 26, 29, 0.72));
+    filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.22));
+}
+
+.scene-machine-left {
+    left: 3%;
+    clip-path: polygon(4% 92%, 16% 48%, 23% 42%, 34% 48%, 39% 72%, 50% 54%, 62% 33%, 70% 40%, 58% 58%, 48% 74%, 61% 74%, 74% 82%, 88% 92%, 82% 100%, 20% 100%);
+}
+
+.scene-machine-right {
+    right: 3%;
+    clip-path: polygon(5% 86%, 18% 68%, 34% 58%, 49% 58%, 61% 42%, 72% 46%, 61% 60%, 74% 77%, 92% 88%, 82% 100%, 12% 100%);
+}
+
+.scene-dust {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 28%;
+    background:
+        radial-gradient(circle at 16% 74%, rgba(255, 255, 255, 0.16), transparent 15%),
+        radial-gradient(circle at 82% 72%, rgba(255, 255, 255, 0.12), transparent 14%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+    opacity: 0.55;
+}
+
+.landing-screen {
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    transition:
+        opacity 240ms ease,
+        visibility 240ms ease;
+}
+
+.landing-screen.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.landing-card {
+    width: min(100%, 330px);
+    padding: 24px 22px;
+    border-radius: 26px;
+    background: linear-gradient(180deg, rgba(22, 26, 29, 0.72), rgba(22, 26, 29, 0.5));
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 16px 36px rgba(13, 14, 16, 0.2);
+    text-align: center;
+}
+
+.landing-kicker {
+    color: var(--uniquip-yellow);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+}
+
+.landing-card h2 {
+    margin: 12px 0 10px;
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: clamp(1.45rem, 5vw, 2rem);
+    line-height: 1;
+}
+
+.landing-card p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.6;
+}
+
+.countdown-overlay {
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: clamp(3.6rem, 16vw, 5.6rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    text-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+}
+
+.countdown-overlay:not(.hidden) {
+    animation: countdownPulse 760ms ease;
+}
+
+.target-zone {
+    z-index: 4;
+    left: 50%;
+    top: 48%;
+    width: var(--target-size, 52%);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    transition: opacity 180ms ease, visibility 180ms ease;
+}
+
+.target-zone.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.target-ring,
+.target-core {
+    position: absolute;
+    border-radius: 50%;
+    transition:
+        transform 220ms ease,
+        border-color 220ms ease,
+        background 220ms ease,
+        box-shadow 220ms ease;
+}
+
+.target-ring-outer {
+    inset: 0;
+    border: 2px solid rgba(255, 255, 255, 0.78);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05)),
+        radial-gradient(circle at center, rgba(247, 181, 0, 0.08), transparent 70%);
+    box-shadow:
+        inset 0 0 0 1px rgba(247, 181, 0, 0.16),
+        0 18px 30px rgba(10, 12, 14, 0.22);
+}
+
+.target-ring-middle {
+    inset: 12%;
+    border: 2px dashed rgba(247, 181, 0, 0.8);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.target-ring-inner {
+    inset: 28%;
+    border: 2px solid rgba(255, 255, 255, 0.72);
+    background: rgba(22, 26, 29, 0.3);
+}
+
+.target-core {
+    inset: 40%;
+    background:
+        radial-gradient(circle, rgba(247, 181, 0, 0.38), rgba(247, 181, 0, 0.14)),
+        rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.game-stage[data-state="success"] .target-zone,
+.target-zone.is-success {
+    animation: targetPulse 620ms ease;
+}
+
+.target-zone.is-perfect .target-ring-middle,
+.target-zone.is-great .target-ring-middle,
+.target-zone.is-good .target-ring-middle,
+.target-zone.is-hit .target-ring-middle {
+    border-color: rgba(247, 181, 0, 0.98);
+}
+
+.target-zone.is-perfect .target-core {
+    background: radial-gradient(circle, rgba(255, 210, 86, 0.94), rgba(247, 181, 0, 0.18));
+    box-shadow: 0 0 22px rgba(255, 210, 86, 0.5);
+}
+
+.target-zone.is-miss .target-ring-outer {
+    border-color: rgba(200, 90, 70, 0.88);
+}
+
+.falling-product {
+    z-index: 6;
+    left: 50%;
+    top: 0;
+    width: 112px;
+    transform: translate3d(-50%, -150px, 0);
+    transform-origin: center center;
+    text-align: center;
+    will-change: transform;
+}
+
+.falling-product img {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.25));
+}
+
+.product-label {
+    display: inline-flex;
+    margin-top: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(22, 26, 29, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.84);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.result-badge {
+    z-index: 7;
+    left: 50%;
+    top: 14%;
+    min-width: 220px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    transform: translateX(-50%);
+    text-align: center;
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    background: rgba(22, 26, 29, 0.76);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 18px 30px rgba(10, 12, 14, 0.24);
+}
+
+.result-badge.perfect,
+.result-badge.great,
+.result-badge.good,
+.result-badge.hit {
+    color: var(--uniquip-yellow);
+}
+
+.result-badge.miss {
+    color: #f4c0b6;
+}
+
+.particles-layer {
+    z-index: 6;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 8px;
+    height: 18px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 181, 0, 0.86));
+    opacity: 0;
+    animation: particleBurst 900ms ease forwards;
+}
+
+.control-panel {
+    position: absolute;
+    z-index: 8;
+    left: 50%;
+    bottom: 10%;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    transform: translateX(-50%);
+}
+
+.primary-button {
+    min-height: 60px;
+    width: min(130%, 260px);
+    border: 0;
+    border-radius: 20px;
+    background:
+        linear-gradient(180deg, #ffd04d 0%, #f7b500 72%, #dea400 100%);
+    color: #131516;
+    cursor: pointer;
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    box-shadow:
+        0 18px 30px rgba(126, 92, 0, 0.26),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    transition:
+        transform 180ms ease,
+        filter 180ms ease,
+        opacity 180ms ease;
+}
+
+.primary-button:disabled,
+.utility-button:disabled,
+.secondary-button:disabled,
+.modal-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    transform: none;
+}
+
+.secondary-button {
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.developer-only {
+    display: none;
+}
+
+body.dev-mode .developer-only[hidden] {
+    display: inline-flex;
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(12, 16, 19, 0.64);
+    backdrop-filter: blur(10px);
+}
+
+.modal-card {
+    position: relative;
+    width: min(100%, 420px);
+    padding: 26px 22px 22px;
+    border-radius: 28px;
+    background:
+        linear-gradient(180deg, rgba(28, 34, 38, 0.96), rgba(22, 26, 29, 0.92)),
+        rgba(22, 26, 29, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 26px 56px rgba(0, 0, 0, 0.28);
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    font-size: 1.3rem;
+}
+
+.modal-body {
+    display: grid;
+    gap: 18px;
+}
+
+.modal-eyebrow {
+    color: var(--uniquip-yellow);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+}
+
+.modal-title {
+    margin: 0;
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: clamp(1.6rem, 6vw, 2rem);
+    line-height: 1;
+}
+
+.modal-copy {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.65;
+}
+
+.modal-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding-left: 20px;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.55;
+}
+
+.modal-prize {
+    display: grid;
+    gap: 14px;
+    justify-items: center;
+    padding: 16px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-prize img {
+    width: 120px;
+    max-width: 100%;
+    filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.32));
+}
+
+.modal-prize h3,
+.modal-prize p {
+    margin: 0;
+}
+
+.modal-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.modal-stat {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-stat-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.64);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+}
+
+.modal-stat-value {
+    display: block;
+    margin-top: 6px;
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+}
+
+.modal-actions {
+    display: grid;
+    gap: 10px;
+}
+
+.modal-action {
+    min-height: 52px;
+    padding: 0 16px;
+    border-radius: 16px;
+    font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.modal-action.primary {
+    border-color: rgba(255, 208, 77, 0.48);
+    background: linear-gradient(180deg, rgba(255, 208, 77, 0.96), rgba(247, 181, 0, 0.92));
+    color: #121517;
+}
+
+.modal-action.secondary {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.status-banner {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@keyframes countdownPulse {
+    0% {
+        opacity: 0;
+        transform: scale(0.86);
+    }
+    20% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1.06);
+    }
+}
+
+@keyframes targetPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.96);
+    }
+    42% {
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes particleBurst {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 0, 0) rotate(0deg) scale(0.9);
+    }
+    12% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate3d(var(--move-x), var(--move-y), 0) rotate(25deg) scale(1.08);
+    }
+}
+
+@media (max-width: 640px) {
+    .app-shell {
+        padding: 10px 10px 12px;
+    }
+
+    .topbar {
+        margin-bottom: 8px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .topbar-actions {
+        justify-content: stretch;
+    }
+
+    .utility-button {
+        flex: 1 1 0;
+    }
+
+    .difficulty-control {
+        flex: 1 1 0;
+    }
+
+    .difficulty-input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .hud {
+        gap: 8px;
+    }
+
+    .hud-card {
+        padding: 9px 10px;
+    }
+
+    .game-stage {
+        border-radius: 26px;
+    }
+
+    .primary-button {
+        min-height: 52px;
+    }
+
+    .result-badge {
+        min-width: 0;
+        width: calc(100% - 34px);
+        font-size: 0.92rem;
+    }
+
+    .modal-card {
+        padding: 24px 18px 18px;
+        border-radius: 24px;
+    }
+}
+
+@media (max-width: 420px) {
+    .brand-block h1 {
+        font-size: 1.56rem;
+    }
+
+    .hud-label {
+        font-size: 0.66rem;
+    }
+
+    .hud-value {
+        font-size: 0.94rem;
+    }
+
+    .landing-card {
+        padding: 22px 18px;
+    }
+
+    .modal-stats {
+        grid-template-columns: 1fr;
+    }
+}

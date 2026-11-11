@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1024">
+  <meta name="description" content="Price Rush — game tebak harga produk yang cepat, seru, dan responsif.">
+  <title>Price Rush — Tebak Harga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Price Rush">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>PRICE <strong>RUSH</strong></span>
+    </a>
+    <div class="top-actions">
+      <div class="best-score" title="Skor terbaik">
+        <span aria-hidden="true">🏆</span>
+        <span>Best <strong id="best-score">0</strong></span>
+      </div>
+      <button class="icon-button" id="sound-toggle" type="button" aria-label="Matikan suara" aria-pressed="true">
+        <span id="sound-icon" aria-hidden="true">♪</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="screen start-screen is-active" id="start-screen" aria-labelledby="start-title">
+      <div class="hero-copy">
+        <div class="eyebrow"><span></span> THE ULTIMATE PRICE CHALLENGE</div>
+        <h1 id="start-title">Seberapa jago kamu<br><em>menebak harga?</em></h1>
+        <p>Kenali produknya, pilih harganya, dan kumpulkan skor sebelum waktu habis.</p>
+
+        <div class="difficulty-block">
+          <span class="field-label">Pilih level permainan</span>
+          <div class="segmented" id="difficulty-selector" role="radiogroup" aria-label="Tingkat kesulitan">
+            <button type="button" role="radio" aria-checked="false" data-difficulty="easy">
+              <span>Easy</span><small>5 soal · 15 dtk</small>
+            </button>
+            <button class="is-selected" type="button" role="radio" aria-checked="true" data-difficulty="medium">
+              <span>Medium</span><small>10 soal · 10 dtk</small>
+            </button>
+            <button type="button" role="radio" aria-checked="false" data-difficulty="hard">
+              <span>Hard</span><small>10 soal · 7 dtk</small>
+            </button>
+          </div>
+        </div>
+
+        <button class="primary-button" id="start-button" type="button">
+          <span>Mulai Tantangan</span><span class="button-arrow" aria-hidden="true">→</span>
+        </button>
+        <div class="quick-guide" aria-label="Cara bermain">
+          <div><span>01</span><p>Lihat<br><strong>Produknya</strong></p></div>
+          <i aria-hidden="true"></i>
+          <div><span>02</span><p>Tebak<br><strong>Harganya</strong></p></div>
+          <i aria-hidden="true"></i>
+          <div><span>03</span><p>Kejar<br><strong>Skor Tinggi</strong></p></div>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <div class="price-tag tag-one"><small>?</small><strong>Rp 24.500</strong></div>
+        <div class="price-tag tag-two"><small>?</small><strong>Rp 89.000</strong></div>
+        <div class="price-tag tag-three"><small>?</small><strong>Rp 12.000</strong></div>
+        <div class="shopping-bag">
+          <span class="bag-handle"></span>
+          <span class="bag-face">?</span>
+        </div>
+        <div class="spark spark-one">✦</div>
+        <div class="spark spark-two">✦</div>
+      </div>
+    </section>
+
+    <section class="screen game-screen" id="game-screen" aria-labelledby="question-title">
+      <div class="game-topline">
+        <div class="stat-block"><span>SKOR</span><strong id="current-score">0</strong></div>
+        <div class="progress-copy"><span id="round-label">SOAL 1 DARI 10</span><strong id="streak-label" aria-live="polite"></strong></div>
+        <div class="timer-pill" id="timer-pill" aria-label="Sisa waktu"><span>◷</span><strong id="timer-text">10</strong><small>detik</small></div>
+      </div>
+      <div class="progress-track" aria-hidden="true"><span id="question-progress"></span></div>
+
+      <div class="question-layout">
+        <article class="product-card" id="product-card">
+          <div class="category-badge" id="product-category">Beverage</div>
+          <div class="product-art" id="product-art" role="img" aria-label="Produk">
+            <span id="product-emoji">☕</span>
+            <i class="art-shadow"></i>
+          </div>
+          <div class="product-meta">
+            <span>PRODUK #<b id="product-number">01</b></span>
+            <h2 id="product-name">Premium Coffee</h2>
+            <p id="product-description">Kopi siap minum dengan rasa lembut.</p>
+          </div>
+        </article>
+
+        <div class="answer-panel">
+          <span class="question-kicker">TEBAK HARGANYA</span>
+          <h2 id="question-title">Berapa harga produk ini?</h2>
+          <p>Pilih satu jawaban yang paling tepat.</p>
+          <div class="answer-grid" id="answer-grid" aria-label="Pilihan harga"></div>
+          <div class="feedback" id="feedback" aria-live="assertive"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen result-screen" id="result-screen" aria-labelledby="result-title">
+      <div class="result-card">
+        <div class="result-burst" aria-hidden="true"><span>★</span></div>
+        <span class="result-kicker">TANTANGAN SELESAI</span>
+        <h1 id="result-title">Price Master!</h1>
+        <p id="result-message">Kamu tahu harga, kamu tahu kualitas.</p>
+        <div class="final-score"><span>TOTAL SKOR</span><strong id="final-score">0</strong><small id="new-record" hidden>REKOR BARU!</small></div>
+        <div class="result-stats">
+          <div><span>Benar</span><strong id="correct-result">0/10</strong></div>
+          <div><span>Akurasi</span><strong id="accuracy-result">0%</strong></div>
+          <div><span>Waktu</span><strong id="time-result">0 dtk</strong></div>
+          <div><span>Timeout</span><strong id="timeout-result">0</strong></div>
+        </div>
+        <button class="primary-button" id="replay-button" type="button"><span>Main Lagi</span><span class="button-arrow" aria-hidden="true">↻</span></button>
+        <button class="text-button" id="home-button" type="button">Ubah tingkat kesulitan</button>
+      </div>
+      <div class="confetti" id="confetti" aria-hidden="true"></div>
+    </section>
+
+    <div class="countdown-overlay" id="countdown-overlay" hidden aria-live="assertive">
+      <span id="countdown-label">SIAP?</span>
+      <strong id="countdown-number">3</strong>
+    </div>
+  </main>
+
+  <footer><span>PRICE RUSH © 2026</span><span>Think fast. Shop smart.</span></footer>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
